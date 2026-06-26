@@ -14,7 +14,6 @@ import { Tunnel } from './Tunnel.js';
 
 export class SpaceManager {
   constructor({ aspect, isLowPower = false, particlesEnabled = true }) {
-    this.lastDive = -1;
     this.prevMousePosition = { x: 0, y: 0 };
     this.mousePosition = { x: 0, y: 0 };
 
@@ -73,11 +72,10 @@ export class SpaceManager {
   }
 
   setDive(progress) {
-    if (progress === this.lastDive) return;
-    this.lastDive = progress;
-    this._camera.position.z = -progress * SPACE.diveDistance;
-    this._camera.fov = this.baseFov + progress * SPACE.fovPunch;
-    this._camera.updateProjectionMatrix();
+    const p = progress - Math.floor(progress)
+    this._camera.position.z = -p * SPACE.diveDistance
+    this._camera.fov = this.baseFov + p * SPACE.fovPunch
+    this._camera.updateProjectionMatrix()
   }
 
   setParallax(x, y) {

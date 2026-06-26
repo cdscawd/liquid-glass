@@ -59,6 +59,7 @@ export class Particles {
   createGeometry() {
     const positions = new Float32Array(this.maxCount * 3);
     const seeds = new Float32Array(this.maxCount);
+    const sizes = new Float32Array(this.maxCount);
     const colors = new Float32Array(this.maxCount * 3);
     const { layout, color } = PARTICLE;
 
@@ -71,8 +72,10 @@ export class Particles {
 
       positions[offset] = x;
       positions[offset + 1] = y;
-      positions[offset + 2] = -Math.random() * SPACE.particleDepth;
+      // 偏向前方分布，近处粒子更密集
+      positions[offset + 2] = -Math.pow(Math.random(), 1.4) * SPACE.particleDepth;
       seeds[i] = Math.random();
+      sizes[i] = 0.55 + Math.random() * 0.9;
 
       const pick = Math.random();
       let rgb;
@@ -88,6 +91,7 @@ export class Particles {
     const geometry = new BufferGeometry();
     geometry.setAttribute('position', new BufferAttribute(positions, 3));
     geometry.setAttribute('aSeed', new BufferAttribute(seeds, 1));
+    geometry.setAttribute('aSize', new BufferAttribute(sizes, 1));
     geometry.setAttribute('aColor', new BufferAttribute(colors, 3));
     return geometry;
   }

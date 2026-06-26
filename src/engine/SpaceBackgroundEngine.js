@@ -3,8 +3,10 @@ import { MOBILE_MQ } from './config/media.js'
 import { SpaceManager } from './space/SpaceManager.js'
 import { debounce, getPixelRatio, getWinSize } from './utils/dom.js'
 
-/** 隧道 dive 单程时长（秒），往返 ping-pong 循环 */
-const DIVE_CYCLE_SEC = 14
+/** 隧道持续向内推进，单周期时长（秒），结束后无缝循环 */
+const DIVE_CYCLE_SEC = 60
+/** 全局动画速率（0.5 = 在当前基础上再慢 50%） */
+const ANIM_SPEED = 0.4
 
 export class SpaceBackgroundEngine {
   constructor(containerEl) {
@@ -40,9 +42,10 @@ export class SpaceBackgroundEngine {
 
       this.timer.update()
       const elapsed = this.timer.getElapsed()
+      const animTime = elapsed * ANIM_SPEED
 
-      this.spaceManager.setDive(this.getDiveProgress(elapsed))
-      this.spaceManager.update(elapsed)
+      this.spaceManager.setDive(animTime / DIVE_CYCLE_SEC)
+      this.spaceManager.update(animTime)
       this.renderer.render(this.spaceManager.scene, this.spaceManager.camera)
     }
 
@@ -73,12 +76,6 @@ export class SpaceBackgroundEngine {
     }
 
     this.onContextRestored = () => this.startLoop()
-  }
-
-  /** 0→1→0 ping-pong，避免 dive 到 1 时相机瞬间跳回 0 */
-  getDiveProgress(elapsed) {
-    const phase = (elapsed / DIVE_CYCLE_SEC) % 2
-    return phase <= 1 ? phase : 2 - phase
   }
 
   resizeSpaceTarget({ wd, wh }) {

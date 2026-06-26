@@ -3,41 +3,41 @@ export const SPACE = {
   tunnelDepth: 55,
   frameHalf: 6,
   tunnelBoxDepth: 140,
-  pulseInterval: 2.6,
-  floaterCount: 16,
-  floaterSpeed: 4,
-  lightSpeed: 8,
+  pulseInterval: 3.0,
+  floaterCount: 14,
+  floaterSpeed: 3.8,
+  lightSpeed: 6.5,
   diveDistance: 26,
-  fovPunch: 18,
+  fovPunch: 10,
   particleCount: 4000,
   particleCountLow: 2000,
   particleDepth: 60,
 };
 
 export const FLOATER = {
-  movement: { sinFreq: 0.3, cosFreq: 0.27, amp: 0.6 },
+  movement: { sinFreq: 0.2, cosFreq: 0.24, amp: 0.45 },
   layout: {
-    baseRadius: 3.5,
-    radiusVariance: 2,
-    xMultiplier: 1.1,
-    scaleMin: 0.5,
-    scaleVariance: 0.7,
-    rotMax: 0.4,
+    baseRadius: 3.2,
+    radiusVariance: 2.2,
+    xMultiplier: 0.95,
+    scaleMin: 0.45,
+    scaleVariance: 0.65,
+    rotMax: 0.35,
   },
   color: {
-    hueBase: 0.55,
-    hueVariance: 0.23,
-    saturation: 0.65,
-    lightness: 0.8,
+    hueBase: 0.48,
+    hueVariance: 0.28,
+    saturation: 0.58,
+    lightness: 0.78,
   },
-  geometry: { boxSize: 1, polyRadius: 0.72 },
+  geometry: { boxSize: 0.92, polyRadius: 0.68 },
   material: {
     color: 0xffffff,
-    shininess: 90,
-    specular: 0x999fff,
-    emissive: 0x4a7ab0,
-    emissiveIntensity: 1.4,
-    reflectivity: 0.6,
+    shininess: 75,
+    specular: 0x88ccdd,
+    emissive: 0x3d8a9e,
+    emissiveIntensity: 1.25,
+    reflectivity: 0.55,
   },
   performance: { reducedRatio: 0.5 },
 };
@@ -47,39 +47,42 @@ export const ENV_MAP = {
   height: 256,
   bg: {
     stops: [
-      { offset: 0, color: '#0a1840' },
-      { offset: 0.5, color: '#05030f' },
-      { offset: 1, color: '#1a0a40' },
+      { offset: 0, color: '#081828' },
+      { offset: 0.45, color: '#040810' },
+      { offset: 1, color: '#1a1038' },
     ],
   },
   neon: {
-    yRatio: 0.45,
-    radiusRatio: 0.6,
+    yRatio: 0.42,
+    radiusRatio: 0.55,
     bands: [
-      { xf: 0.2, color: '#1e6bff' },
-      { xf: 0.5, color: '#00d8ff' },
-      { xf: 0.78, color: '#9b4dff' },
+      { xf: 0.18, color: '#2ec4b6' },
+      { xf: 0.52, color: '#e8a84a' },
+      { xf: 0.82, color: '#c77dff' },
     ],
   },
 };
 
 export const LIGHTS = {
-  ambient: { color: '#6688bb', intensity: 1.1 },
-  cyan: { color: '#33aaff', intensity: 50, distance: 60, decay: 2 },
-  purple: { color: '#9944ff', intensity: 50, distance: 60, decay: 2 },
-  layout: { ratioX: 0.6, ratioY: 0.3, purpleOffsetZ: 40 },
+  ambient: { color: '#557799', intensity: 1.05 },
+  cyan: { color: '#44c9bb', intensity: 46, distance: 58, decay: 2 },
+  purple: { color: '#b86ed4', intensity: 44, distance: 58, decay: 2 },
+  layout: { ratioX: 0.55, ratioY: 0.28, purpleOffsetZ: 38 },
 };
 
 export const PARTICLE = {
-  layout: { baseRadius: 4, radiusVariance: 2, xMultiplier: 1.1 },
+  layout: { baseRadius: 3.6, radiusVariance: 2.4, xMultiplier: 0.92 },
   color: {
-    threshold1: 0.66,
-    threshold2: 0.33,
-    blue: [0.3, 0.6, 1],
-    cyan: [0.5, 0.95, 1],
-    purple: [0.65, 0.35, 1],
+    threshold1: 0.7,
+    threshold2: 0.38,
+    /** 薄荷青 — 主色调 */
+    blue: [0.42, 0.88, 0.92],
+    /** 琥珀金 — 暖色点缀 */
+    cyan: [0.98, 0.72, 0.38],
+    /** 淡紫粉 — 辅助色 */
+    purple: [0.88, 0.48, 0.96],
   },
-  uniforms: { speed: 14, size: 0.35, flow: 2.5 },
+  uniforms: { speed: 8, size: 0.4, flow: 1.75 },
   performance: { reducedRatio: 0.5 },
 };
 
