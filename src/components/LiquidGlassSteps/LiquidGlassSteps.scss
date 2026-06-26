@@ -1,0 +1,65 @@
+@use '../../styles/glass-mixins' as *;
+
+.liquid-glass-steps {
+  @include glass-surface;
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 640px;
+  padding: 16px;
+
+  &--vertical {
+    flex-direction: column;
+  }
+
+  &__item {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border: 1px solid $glass-border;
+    border-radius: $glass-radius-pill;
+    background: $glass-bg-subtle;
+    color: $glass-text-muted;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__item--process &__icon {
+    background: $glass-bg-selected;
+    color: $glass-text-primary;
+    border-color: rgba(255, 255, 255, 0.45);
+  }
+
+  &__item--finish &__icon {
+    color: $glass-text-primary;
+    border-color: $glass-border-success;
+  }
+
+  &__item--error &__icon {
+    border-color: $glass-border-error;
+    color: rgba(255, 160, 160, 0.95);
+  }
+
+  &__title {
+    color: $glass-text-primary;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &__desc {
+    margin-top: 2px;
+    color: $glass-text-muted;
+    font-size: 12px;
+  }
+}

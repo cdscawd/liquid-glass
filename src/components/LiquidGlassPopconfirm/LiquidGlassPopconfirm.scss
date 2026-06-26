@@ -1,0 +1,25 @@
+.liquid-glass-popconfirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+  padding: 4px;
+
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+  }
+}

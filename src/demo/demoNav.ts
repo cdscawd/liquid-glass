@@ -23,7 +23,10 @@ export const DEMO_NAV: DemoNavGroup[] = [
   },
   {
     title: '表单',
-    items: [{ id: 'form', label: 'Input & Controls' }],
+    items: [
+      { id: 'form', label: 'Input & Controls' },
+      { id: 'data-entry', label: 'Checkbox & Select' },
+    ],
   },
   {
     title: '容器',
@@ -31,15 +34,26 @@ export const DEMO_NAV: DemoNavGroup[] = [
       { id: 'card', label: 'Card & Media' },
       { id: 'tabs', label: 'Tabs' },
       { id: 'list', label: 'List & Avatar' },
+      { id: 'data-display', label: 'Empty & Collapse' },
     ],
   },
   {
+    title: '布局',
+    items: [{ id: 'layout', label: 'Space & Typography' }],
+  },
+  {
     title: '导航',
-    items: [{ id: 'navigation', label: 'Navbar & Dock' }],
+    items: [
+      { id: 'navigation', label: 'Navbar & Dock' },
+      { id: 'nav-more', label: 'Steps & Menu' },
+    ],
   },
   {
     title: '浮层',
-    items: [{ id: 'overlay', label: 'Modal & Feedback' }],
+    items: [
+      { id: 'overlay', label: 'Modal & Feedback' },
+      { id: 'feedback', label: 'Spin & Result' },
+    ],
   },
 ]
 

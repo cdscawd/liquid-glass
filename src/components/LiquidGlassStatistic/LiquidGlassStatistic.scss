@@ -1,0 +1,36 @@
+@use '../../styles/glass-mixins' as *;
+
+.liquid-glass-statistic {
+  @include glass-surface;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+  padding: 16px 20px;
+
+  &__title {
+    color: $glass-text-muted;
+    font-family: $font-sans;
+    font-size: 13px;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    color: $glass-text-primary;
+    font-family: $font-sans;
+  }
+
+  &__number {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  &__prefix,
+  &__suffix {
+    font-size: 16px;
+    color: $glass-text-secondary;
+  }
+}

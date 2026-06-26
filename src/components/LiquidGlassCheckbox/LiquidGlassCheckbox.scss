@@ -1,0 +1,62 @@
+@use '../../styles/glass-mixins' as *;
+
+.liquid-glass-checkbox {
+  @include glass-surface;
+  @include glass-interactive;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+
+  &--sm {
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+
+  &--lg {
+    padding: 8px 12px;
+    font-size: 15px;
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  &__box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border: 1px solid $glass-border;
+    border-radius: 4px;
+    background: $glass-bg-subtle;
+  }
+
+  &--checked &__box {
+    background: $glass-bg-selected;
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  &__mark {
+    color: $glass-text-primary;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  &__label {
+    color: $glass-text-primary;
+    font-family: $font-sans;
+    font-size: 14px;
+  }
+}

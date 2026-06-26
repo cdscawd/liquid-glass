@@ -1,0 +1,82 @@
+@use '../../styles/glass-mixins' as *;
+
+.liquid-glass-radio-group {
+  @include glass-surface;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+}
+
+.liquid-glass-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: calc(#{$glass-radius-pill} - 2px);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &--sm {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  &--lg {
+    padding: 10px 16px;
+    font-size: 15px;
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(&--disabled):not(&--checked) {
+    background: $glass-bg-item-hover;
+  }
+
+  &--checked {
+    background: $glass-bg-selected;
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  &__dot {
+    position: relative;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border: 1px solid $glass-border;
+    border-radius: $glass-radius-pill;
+    background: $glass-bg-subtle;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: $glass-radius-pill;
+      background: $glass-text-primary;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.15s ease;
+    }
+  }
+
+  &--checked &__dot::after {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  &__label {
+    color: $glass-text-primary;
+    font-family: $font-sans;
+    font-size: 14px;
+  }
+}

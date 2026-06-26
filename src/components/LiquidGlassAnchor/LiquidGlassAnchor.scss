@@ -1,0 +1,28 @@
+@use '../../styles/glass-mixins' as *;
+
+.liquid-glass-anchor {
+  @include glass-surface;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 140px;
+  padding: 10px 12px;
+
+  &__link {
+    display: block;
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: $glass-text-muted;
+    font-family: $font-sans;
+    font-size: 13px;
+    text-decoration: none;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+
+    &:hover {
+      background: $glass-bg-item-hover;
+      color: $glass-text-primary;
+    }
+  }
+}

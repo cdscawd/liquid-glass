@@ -1,0 +1,61 @@
+@use '../../styles/glass-mixins' as *;
+
+.liquid-glass-spin-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.liquid-glass-spin {
+  @include glass-surface;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+
+  &--overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+  }
+
+  &--sm {
+    padding: 10px 14px;
+  }
+
+  &--lg {
+    padding: 20px 24px;
+  }
+
+  &__indicator {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-top-color: $glass-text-primary;
+    border-radius: $glass-radius-pill;
+    animation: lg-spin 0.8s linear infinite;
+  }
+
+  &--sm &__indicator {
+    width: 18px;
+    height: 18px;
+  }
+
+  &--lg &__indicator {
+    width: 32px;
+    height: 32px;
+  }
+
+  &__tip {
+    color: $glass-text-secondary;
+    font-size: 13px;
+  }
+}
+
+@keyframes lg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

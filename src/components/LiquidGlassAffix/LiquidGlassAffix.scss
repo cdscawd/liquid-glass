@@ -1,0 +1,9 @@
+.liquid-glass-affix {
+  &__content {
+    z-index: 10;
+
+    &--fixed {
+      z-index: 100;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+.liquid-glass-space {
+  display: inline-flex;
+  flex-direction: row;
+
+  &--vertical {
+    flex-direction: column;
+  }
+
+  &--wrap {
+    flex-wrap: wrap;
+  }
+
+  &__split {
+    color: rgba(255, 255, 255, 0.35);
+    user-select: none;
+  }
+}

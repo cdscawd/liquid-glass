@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import {
   LiquidGlassAlert,
+  LiquidGlassAnchor,
   LiquidGlassAvatar,
   LiquidGlassAvatarGroup,
   LiquidGlassBadge,
@@ -8,24 +9,44 @@ import {
   LiquidGlassButton,
   LiquidGlassButtonGroup,
   LiquidGlassCard,
+  LiquidGlassCheckbox,
+  LiquidGlassCollapse,
   LiquidGlassDivider,
   LiquidGlassDock,
   LiquidGlassDrawer,
+  LiquidGlassDropdown,
+  LiquidGlassEmpty,
+  LiquidGlassFloatButton,
   LiquidGlassIconButton,
   LiquidGlassInput,
   LiquidGlassList,
   LiquidGlassMediaCard,
+  LiquidGlassMenu,
   LiquidGlassModal,
   LiquidGlassNavbar,
   LiquidGlassPagination,
+  LiquidGlassPopconfirm,
   LiquidGlassPopover,
   LiquidGlassProgress,
+  LiquidGlassRadio,
+  LiquidGlassRadioGroup,
+  LiquidGlassRate,
+  LiquidGlassResult,
+  LiquidGlassSelect,
+  LiquidGlassSkeleton,
   LiquidGlassSlider,
+  LiquidGlassSpace,
+  LiquidGlassSpin,
+  LiquidGlassStatistic,
+  LiquidGlassSteps,
   LiquidGlassSwitch,
   LiquidGlassTabs,
+  LiquidGlassTag,
   LiquidGlassTextarea,
+  LiquidGlassTimeline,
   LiquidGlassToast,
   LiquidGlassTooltip,
+  LiquidGlassTypography,
 } from '../components'
 import type { LiquidGlassParams } from '../lib/liquid-glass'
 import { DemoBlock } from './DemoBlock'
@@ -997,6 +1018,244 @@ export function OverlaySection() {
           description={`Toast variant="${toastVariant}"`}
         />
       )}
+    </DemoSection>
+  )
+}
+
+export function DataEntrySection() {
+  const [radioValue, setRadioValue] = useState('a')
+  const [rateValue, setRateValue] = useState(3)
+
+  return (
+    <DemoSection
+      id="data-entry"
+      title="Data Entry"
+      hint="Checkbox / Radio / Select / Rate"
+      propsHint="对齐 Ant Design 数据录入组件"
+    >
+      <DemoBlock
+        title="Checkbox checked / label"
+        code={`<LiquidGlassCheckbox label="Accept terms" defaultChecked />`}
+      >
+        <LiquidGlassCheckbox label="Accept terms" defaultChecked />
+        <LiquidGlassCheckbox label="Disabled" disabled />
+      </DemoBlock>
+
+      <DemoBlock
+        title="RadioGroup value / onChange"
+        code={`<LiquidGlassRadioGroup value={v} onChange={setV}>\n  <LiquidGlassRadio value="a">A</LiquidGlassRadio>\n</LiquidGlassRadioGroup>`}
+      >
+        <LiquidGlassRadioGroup value={radioValue} onValueChange={setRadioValue}>
+          <LiquidGlassRadio value="a" label="Option A" />
+          <LiquidGlassRadio value="b" label="Option B" />
+          <LiquidGlassRadio value="c" label="Option C" disabled />
+        </LiquidGlassRadioGroup>
+      </DemoBlock>
+
+      <DemoBlock
+        title="Select options"
+        code={`<LiquidGlassSelect options={[{ value: '1', label: 'One' }]} defaultValue="1" />`}
+      >
+        <LiquidGlassSelect
+          style={{ minWidth: 160 }}
+          defaultValue="react"
+          options={[
+            { value: 'react', label: 'React' },
+            { value: 'vue', label: 'Vue' },
+            { value: 'svelte', label: 'Svelte' },
+          ]}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="Rate allowHalf / value"
+        code={`<LiquidGlassRate value={3} onChange={setRate} allowHalf />`}
+      >
+        <LiquidGlassRate value={rateValue} onChange={setRateValue} allowHalf />
+      </DemoBlock>
+    </DemoSection>
+  )
+}
+
+export function DataDisplaySection() {
+  return (
+    <DemoSection
+      id="data-display"
+      title="Data Display"
+      hint="Empty / Tag / Collapse / Statistic / Timeline"
+    >
+      <DemoBlock title="Empty description" code={`<LiquidGlassEmpty description="暂无数据" />`}>
+        <LiquidGlassEmpty description="暂无数据">
+          <LiquidGlassButton size="sm">创建</LiquidGlassButton>
+        </LiquidGlassEmpty>
+      </DemoBlock>
+
+      <DemoBlock title="Tag color / closable" code={`<LiquidGlassTag color="blue">Tag</LiquidGlassTag>`}>
+        <LiquidGlassTag color="info">Info</LiquidGlassTag>
+        <LiquidGlassTag color="success">Success</LiquidGlassTag>
+        <LiquidGlassTag closable onClose={() => {}}>
+          Closable
+        </LiquidGlassTag>
+      </DemoBlock>
+
+      <DemoBlock
+        title="Collapse accordion"
+        code={`<LiquidGlassCollapse accordion items={[...]} defaultActiveKeys={['1']} />`}
+      >
+        <LiquidGlassCollapse
+          accordion
+          defaultActiveKeys={['1']}
+          items={[
+            { key: '1', label: 'Panel 1', children: 'Collapse panel content one.' },
+            { key: '2', label: 'Panel 2', children: 'Panel two with glass surface.' },
+          ]}
+          style={{ width: 320 }}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="Statistic title / value"
+        code={`<LiquidGlassStatistic title="Users" value={112893} suffix="人" />`}
+      >
+        <LiquidGlassStatistic title="Active Users" value={112893} suffix="人" />
+      </DemoBlock>
+
+      <DemoBlock title="Timeline items" code={`<LiquidGlassTimeline items={[...]} />`}>
+        <LiquidGlassTimeline
+          items={[
+            { key: '1', label: '2024-01', children: 'Create project' },
+            { key: '2', label: '2024-06', children: 'Release v1.0' },
+            { key: '3', label: '2025-03', children: 'Liquid glass refresh' },
+          ]}
+          style={{ width: 320 }}
+        />
+      </DemoBlock>
+    </DemoSection>
+  )
+}
+
+export function LayoutSection() {
+  return (
+    <DemoSection id="layout" title="Layout" hint="Space / Typography">
+      <DemoBlock title="Space horizontal / vertical" code={`<LiquidGlassSpace><Button /><Button /></LiquidGlassSpace>`}>
+        <LiquidGlassSpace>
+          <LiquidGlassButton size="sm">A</LiquidGlassButton>
+          <LiquidGlassButton size="sm">B</LiquidGlassButton>
+          <LiquidGlassButton size="sm">C</LiquidGlassButton>
+        </LiquidGlassSpace>
+        <LiquidGlassSpace direction="vertical" size="sm">
+          <LiquidGlassButton size="sm">Top</LiquidGlassButton>
+          <LiquidGlassButton size="sm">Bottom</LiquidGlassButton>
+        </LiquidGlassSpace>
+      </DemoBlock>
+
+      <DemoBlock title="Typography Title / Text" code={`<LiquidGlassTypography.Title level={2}>Title</LiquidGlassTypography.Title>`}>
+        <LiquidGlassTypography.Title level={2}>Liquid Glass</LiquidGlassTypography.Title>
+        <LiquidGlassTypography.Paragraph>
+          Paragraph with secondary tone and glass-friendly contrast.
+        </LiquidGlassTypography.Paragraph>
+        <LiquidGlassTypography.Text type="success">Success text</LiquidGlassTypography.Text>
+        {' · '}
+        <LiquidGlassTypography.Text type="danger" delete>
+          Deleted
+        </LiquidGlassTypography.Text>
+      </DemoBlock>
+    </DemoSection>
+  )
+}
+
+export function NavMoreSection() {
+  const [menuKey, setMenuKey] = useState('home')
+
+  return (
+    <DemoSection id="nav-more" title="Navigation More" hint="Steps / Anchor / Menu / Dropdown">
+      <DemoBlock title="Steps current" code={`<LiquidGlassSteps current={1} items={[...]} />`}>
+        <LiquidGlassSteps
+          current={1}
+          items={[
+            { title: 'Finished', description: 'Step 1' },
+            { title: 'In Progress', description: 'Step 2' },
+            { title: 'Waiting', description: 'Step 3' },
+          ]}
+          style={{ width: '100%', maxWidth: 520 }}
+        />
+      </DemoBlock>
+
+      <DemoBlock title="Anchor links" code={`<LiquidGlassAnchor links={[...]} />`}>
+        <LiquidGlassAnchor
+          links={[
+            { key: 'theme', href: '#theme', title: 'Theme' },
+            { key: 'button', href: '#button', title: 'Button' },
+            { key: 'form', href: '#form', title: 'Form' },
+          ]}
+        />
+      </DemoBlock>
+
+      <DemoBlock title="Menu selectedKeys" code={`<LiquidGlassMenu items={items} selectedKeys={[key]} />`}>
+        <LiquidGlassMenu
+          selectedKeys={[menuKey]}
+          onSelect={setMenuKey}
+          items={[
+            { key: 'home', label: 'Home', icon: '🏠' },
+            { key: 'docs', label: 'Docs', icon: '📄' },
+            { key: 'settings', label: 'Settings', icon: '⚙️', disabled: true },
+          ]}
+        />
+      </DemoBlock>
+
+      <DemoBlock title="Dropdown menu" code={`<LiquidGlassDropdown trigger={<Button />} items={items} />`}>
+        <LiquidGlassDropdown
+          trigger={<LiquidGlassButton size="sm">Dropdown</LiquidGlassButton>}
+          items={[
+            { key: '1', label: 'Profile' },
+            { key: '2', label: 'Settings' },
+            { key: '3', label: 'Logout', danger: true },
+          ]}
+        />
+      </DemoBlock>
+    </DemoSection>
+  )
+}
+
+export function FeedbackSection() {
+  return (
+    <DemoSection id="feedback" title="Feedback More" hint="Spin / Skeleton / Result / Popconfirm / FloatButton">
+      <DemoBlock title="Spin tip / size" code={`<LiquidGlassSpin tip="Loading…" />`}>
+        <LiquidGlassSpin tip="Loading…" />
+        <LiquidGlassSpin size="sm" />
+      </DemoBlock>
+
+      <DemoBlock title="Skeleton avatar / paragraph" code={`<LiquidGlassSkeleton avatar paragraph={{ rows: 3 }} active />`}>
+        <LiquidGlassSkeleton avatar paragraph={{ rows: 3 }} active />
+      </DemoBlock>
+
+      <DemoBlock title="Result status" code={`<LiquidGlassResult status="success" title="Done" />`}>
+        <LiquidGlassResult
+          status="success"
+          title="Submission Successful"
+          subTitle="Order has been processed."
+          extra={<LiquidGlassButton size="sm">Back</LiquidGlassButton>}
+        />
+      </DemoBlock>
+
+      <DemoBlock title="Popconfirm onConfirm" code={`<LiquidGlassPopconfirm title="Delete?" onConfirm={...} trigger={...} />`}>
+        <LiquidGlassPopconfirm
+          title="Delete this item?"
+          description="This action cannot be undone."
+          onConfirm={() => {}}
+          trigger={<LiquidGlassButton size="sm">Delete</LiquidGlassButton>}
+        />
+      </DemoBlock>
+
+      <DemoBlock title="FloatButton" code={`<LiquidGlassFloatButton icon="+" description="Help" />`}>
+        <div style={{ position: 'relative', height: 80, width: '100%' }}>
+          <LiquidGlassFloatButton
+            icon="+"
+            description="Help"
+            style={{ position: 'absolute', right: 0, bottom: 0 }}
+          />
+        </div>
+      </DemoBlock>
     </DemoSection>
   )
 }

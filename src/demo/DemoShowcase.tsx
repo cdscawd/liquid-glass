@@ -7,8 +7,13 @@ import {
   ButtonGroupSection,
   ButtonSection,
   CardSection,
+  DataDisplaySection,
+  DataEntrySection,
+  FeedbackSection,
   FormSection,
+  LayoutSection,
   ListSection,
+  NavMoreSection,
   NavigationSection,
   OverlaySection,
   TabsSection,
@@ -81,11 +86,16 @@ export function DemoShowcase() {
             <ButtonGroupSection />
             <BadgeSection />
             <FormSection />
+            <DataEntrySection />
             <CardSection />
             <TabsSection />
             <ListSection />
+            <DataDisplaySection />
+            <LayoutSection />
             <NavigationSection />
+            <NavMoreSection />
             <OverlaySection />
+            <FeedbackSection />
 
             <footer className="demo-showcase__footer">
               赛博隧道 Three.js 背景 · 玻璃折射建议在 Chrome 查看

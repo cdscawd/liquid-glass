@@ -1,0 +1,36 @@
+@use '../../styles/glass-mixins' as *;
+
+.liquid-glass-rate {
+  @include glass-surface;
+  display: inline-flex;
+  gap: 4px;
+  padding: 8px 12px;
+
+  &--disabled {
+    opacity: 0.5;
+  }
+
+  &__star {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $glass-text-faint;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+
+    &:hover:not(:disabled) {
+      transform: scale(1.08);
+    }
+
+    &--active,
+    &--half {
+      color: rgba(255, 210, 120, 0.95);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+}
