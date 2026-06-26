@@ -1,6 +1,7 @@
-import { type HTMLAttributes, type ReactNode } from 'react'
+import { type HTMLAttributes, type ReactNode, useLayoutEffect } from 'react'
 import {
   LiquidGlassFilter,
+  isPillBorderRadius,
   useLiquidGlassEffect,
   type LiquidGlassParams,
   type LiquidGlassVariant,
@@ -38,7 +39,32 @@ export function CardLiquidGlass({
       variant,
     })
 
+  const isPill = isPillBorderRadius(borderRadius)
   const sizeClass = size === 'md' ? '' : ` card-liquid-glass--${size}`
+  const pillClass = isPill ? ' card-liquid-glass--pill' : ''
+
+  useLayoutEffect(() => {
+    const el = hostRef.current
+    if (!el || !isPill) {
+      el?.style.removeProperty('--card-pill-inline')
+      return
+    }
+
+    const sync = () => {
+      const { width, height } = el.getBoundingClientRect()
+      if (height < 2) return
+      const capRadius = Math.min(borderRadius, height / 2, width / 2)
+      el.style.setProperty('--card-pill-inline', `${Math.ceil(capRadius + 12)}px`)
+    }
+
+    sync()
+    const observer = new ResizeObserver(sync)
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      el.style.removeProperty('--card-pill-inline')
+    }
+  }, [borderRadius, hostRef, isPill])
 
   return (
     <>
@@ -51,7 +77,7 @@ export function CardLiquidGlass({
       />
       <div
         ref={hostRef}
-        className={`card-liquid-glass${sizeClass}${variantClass}${className ? ` ${className}` : ''}`}
+        className={`card-liquid-glass${sizeClass}${pillClass}${variantClass}${className ? ` ${className}` : ''}`}
         style={{ ...filterStyle, borderRadius, ...style }}
         {...props}
       >

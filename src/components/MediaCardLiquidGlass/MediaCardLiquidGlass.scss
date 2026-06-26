@@ -19,6 +19,14 @@
     padding-bottom: 14px;
   }
 
+  &.card-liquid-glass--pill {
+    .card-liquid-glass__header,
+    .card-liquid-glass__body,
+    .card-liquid-glass__footer {
+      padding-inline: var(--card-pill-inline, 72px);
+    }
+  }
+
   &__media {
     width: 100%;
     aspect-ratio: 16 / 9;

@@ -14,6 +14,13 @@ export const DEFAULT_EDGE_FALLOFF_RATIO = 0.18
 
 /** 形状预设（与 _variables.scss 对齐） */
 export const PILL_BORDER_RADIUS = 999
+
+/** borderRadius 达到 pill 预设，或已覆盖短边一半时视为胶囊形 */
+export function isPillBorderRadius(borderRadius: number, shortSide?: number): boolean {
+  if (borderRadius >= PILL_BORDER_RADIUS) return true
+  if (shortSide != null && shortSide > 0 && borderRadius >= shortSide / 2) return true
+  return false
+}
 export const DOCK_BORDER_RADIUS = 24
 export const BADGE_BORDER_RADIUS = 6
 

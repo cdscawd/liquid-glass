@@ -10,6 +10,7 @@ export {
   DISPLACEMENT_SCALE,
   DOCK_BORDER_RADIUS,
   GLASS_SHAPE,
+  isPillBorderRadius,
   PILL_BORDER_RADIUS,
   type GlassShapePreset,
 } from './constants'

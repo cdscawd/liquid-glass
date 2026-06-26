@@ -21,6 +21,10 @@
     font-size: 15px;
   }
 
+  &--pill {
+    padding-inline: var(--card-pill-inline, 72px);
+  }
+
   &__header {
     margin-bottom: 12px;
     font-size: 1.05em;
