@@ -1,0 +1,102 @@
+@use '../styles/variables' as *;
+
+.demo-sidebar {
+  &.liquid-glass-card {
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+    width: 220px;
+    height: 100svh;
+    min-width: 0;
+    padding: 16px 12px 20px;
+    border-radius: 0;
+    border-top: none;
+    border-bottom: none;
+    border-left: none;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 0 4px;
+  }
+
+  &__brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  &__title {
+    color: $glass-text-primary;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-shadow: 0 1px 4px $glass-shadow-outer;
+  }
+
+  &__divider {
+    &.liquid-glass-divider--horizontal {
+      width: 100%;
+      max-width: none;
+      margin-bottom: 14px;
+    }
+  }
+
+  &__nav {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+
+  &__group {
+    & + & {
+      margin-top: 12px;
+    }
+  }
+
+  &__group-title {
+    margin-bottom: 6px;
+    padding: 0 6px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__list {
+    &.liquid-glass-list {
+      max-width: none;
+      padding: 2px;
+    }
+
+    .liquid-glass-list__btn {
+      padding: 8px 10px;
+    }
+
+    .liquid-glass-list__title {
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .demo-sidebar {
+    &.liquid-glass-card {
+      position: relative;
+      width: 100%;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid $glass-divider;
+    }
+
+    &__nav {
+      max-height: 240px;
+    }
+  }
+}

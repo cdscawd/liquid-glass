@@ -1,0 +1,90 @@
+@use '../styles/variables' as *;
+
+.demo-block {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.22);
+
+  &__header {
+    margin-bottom: 14px;
+  }
+
+  &__title {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  &__preview {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 16px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  &__code-panel {
+    margin-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 10px;
+  }
+
+  &__code-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    border: none;
+    background: none;
+    color: rgba(255, 255, 255, 0.65);
+    font-family: $font-sans;
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    &--open {
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+
+  &__code-toggle-icon {
+    font-size: 10px;
+    line-height: 1;
+  }
+
+  &__code {
+    margin: 10px 0 0;
+    padding: 14px 16px;
+    overflow-x: auto;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    code {
+      color: rgba(200, 230, 255, 0.92);
+      font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre;
+    }
+  }
+}
