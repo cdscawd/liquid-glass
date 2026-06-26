@@ -1,4 +1,4 @@
-import { DISPLACEMENT_SCALE } from '../../lib/liquid-glass'
+import { DISPLACEMENT_SCALE } from './constants'
 
 interface LiquidGlassFilterProps {
   filterId: string

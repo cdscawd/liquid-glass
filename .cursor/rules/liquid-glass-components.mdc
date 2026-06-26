@@ -1,0 +1,126 @@
+---
+description: Liquid Glass 组件族统一规范（基于 LiquidGlassButton）
+globs: src/components/LiquidGlass*/**/*.{tsx,scss,ts},src/lib/liquid-glass/**/*
+alwaysApply: false
+---
+
+# Liquid Glass 组件规范
+
+新增 `LiquidGlass*` 组件时，必须复用同一套「位移贴图 + SVG feDisplacementMap + backdrop-filter」管线，视觉与 API 与 `LiquidGlassButton` 保持一致。
+
+## 目录与命名
+
+```
+src/components/LiquidGlassCard/
+  LiquidGlassCard.tsx
+  LiquidGlassCard.scss
+  index.ts
+src/lib/liquid-glass/          # 共享算法、常量、Filter（禁止在各组件内复制）
+```
+
+- 组件名：`LiquidGlass` + 语义名（PascalCase），如 `LiquidGlassCard`
+- CSS 类名：`liquid-glass-<kebab>`，修饰符 `--sm` / `--lg` 等
+- Props 类型：`LiquidGlass<Name>Props`，尺寸联合类型 `LiquidGlass<Name>Size`
+
+## 不可变的核心效果（所有组件必须相同）
+
+```tsx
+// 1. 唯一 filter id
+const reactId = useId().replace(/:/g, '')
+const filterId = `liquid-glass-${reactId}`
+const mapId = `${filterId}-map`
+
+// 2. ResizeObserver 按真实尺寸生成贴图
+generateDisplacementMap({ width, height, borderRadius, edgeFalloff, strength })
+
+// 3. 固定 backdrop 链（禁止修改或各组件各写一套）
+const BACKDROP_FILTER =
+  'blur(0.25px) contrast(1.2) brightness(1.05) saturate(1.1)'
+
+// 4. 应用到宿主元素
+backdropFilter: `url(#${filterId}) ${BACKDROP_FILTER}`
+WebkitBackdropFilter: `url(#${filterId}) ${BACKDROP_FILTER}`
+```
+
+- `DISPLACEMENT_SCALE`、`generateDisplacementMap`、SDF 算法：只从 `src/lib/liquid-glass` 导入
+- `LiquidGlassFilter`：从 `src/lib/liquid-glass` 导入（若仍在 Button 目录，先迁移再建新组件）
+- 禁止改 `feDisplacementMap` 的 channel / scale，禁止用 CSS `filter` 替代 SVG 位移
+
+## Props API
+
+每个组件 Props **必须**包含：
+
+```tsx
+interface LiquidGlassXxxProps extends /* 对应原生 HTML 属性 */ {
+  glassParams?: LiquidGlassParams  // borderRadius | edgeFalloff | strength
+  size?: 'sm' | 'md' | 'lg'       // 若组件有尺寸变体
+  className?: string
+  style?: CSSProperties
+}
+```
+
+- `glassParams` 语义与 `LiquidGlassButton` 一致，默认值走 `DEFAULT_BORDER_RADIUS` 等 lib 常量
+- `borderRadius` 同时写入 inline style 与 `generateDisplacementMap`，保证贴图与视觉圆角对齐
+- 其余 props 透传给宿主 DOM（`...props`）
+
+## 组件结构模板
+
+```tsx
+export function LiquidGlassXxx({ glassParams, size = 'md', className = '', style, children, ...props }) {
+  // useId → filterId / mapId
+  // useRef + useState(mapUrl, filterSize) + ResizeObserver
+  // useCallback(updateMap) + useMemo(filterStyle)
+
+  return (
+    <>
+      <LiquidGlassFilter filterId={filterId} mapId={mapId} mapUrl={mapUrl} width={...} height={...} />
+      <HostElement
+        ref={hostRef}
+        className={`liquid-glass-xxx${sizeClass}${className ? ` ${className}` : ''}`}
+        style={{ ...filterStyle, borderRadius, ...style }}
+        {...props}
+      >
+        {children}
+      </HostElement>
+    </>
+  )
+}
+```
+
+- Fragment 包裹 Filter + 宿主；Filter SVG 不参与布局（`width={0} height={0}`）
+- `ResizeObserver` 依赖 `[updateMap, children]`，尺寸变化必须重新生成贴图
+- 默认导出 + 命名导出；`index.ts` 再导出类型
+
+## 样式（SCSS）
+
+```scss
+@use '../../styles/variables' as *;
+
+.liquid-glass-xxx {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid $glass-border;
+  border-radius: $glass-radius;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    $glass-shadow-outer 0 4px 8px,
+    $glass-shadow-inner 0 -10px 25px inset;
+  // 组件特有 layout 可不同，玻璃质感变量必须复用
+}
+```
+
+- 玻璃边框/阴影/圆角变量只用 `_variables.scss` 中的 `$glass-*`
+- 新增全局 glass token 时加到 `_variables.scss`，不在组件 SCSS 硬编码
+- `.liquid-glass-filter` 样式全局唯一，不重复定义
+
+## 导出
+
+1. `src/components/LiquidGlassXxx/index.ts` — 组件 + 类型
+2. `src/components/index.ts` — 追加 barrel export
+
+## 禁止
+
+- 在组件内复制 `generateDisplacementMap` / `LiquidGlassFilter` / `BACKDROP_FILTER`
+- 为「省事」用纯 CSS blur 冒充 liquid glass 效果
+- 修改 `DISPLACEMENT_SCALE` 或 backdrop 链而不更新所有组件
+- 跳过 `ResizeObserver`（固定尺寸贴图会导致边缘折射错位）

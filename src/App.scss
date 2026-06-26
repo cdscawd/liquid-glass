@@ -39,6 +39,30 @@ $demo-bg-positions: 0 0, 210px 160px, 320px 80px, 40px 240px;
   max-width: 960px;
 }
 
+.app__section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.app__section-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+.app__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
 .app__title {
   margin: 0;
   font-size: 28px;

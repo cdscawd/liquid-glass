@@ -1,0 +1,74 @@
+@use '../../styles/variables' as *;
+
+.liquid-glass-button-group {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid $glass-border;
+  border-radius: $glass-radius;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    $glass-shadow-outer 0 4px 8px,
+    $glass-shadow-inner 0 -10px 25px inset;
+
+  &__item {
+    position: relative;
+    display: inline-flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 10px 20px;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: $font-sans;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.25;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &:hover:not(:disabled):not(&--selected) {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+    }
+
+    &--selected {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.45);
+      outline-offset: -2px;
+      z-index: 1;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &--sm {
+      min-height: 32px;
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+
+    &--lg {
+      min-height: 48px;
+      padding: 12px 28px;
+      font-size: 16px;
+    }
+  }
+}

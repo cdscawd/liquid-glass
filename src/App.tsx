@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { LiquidGlassButton } from './components/LiquidGlassButton'
+import { LiquidGlassButtonGroup } from './components/LiquidGlassButtonGroup'
 import type { LiquidGlassParams } from './lib/liquid-glass'
 import './App.scss'
 
@@ -54,17 +56,128 @@ const DEMO_BUTTONS: DemoButton[] = [
   },
 ]
 
+interface DemoButtonGroup {
+  name: string
+  defaultValue: string
+  items: { value: string; label: string }[]
+  size?: 'sm' | 'md' | 'lg'
+}
+
+const DEMO_BUTTON_GROUPS: DemoButtonGroup[] = [
+  {
+    name: 'period',
+    defaultValue: 'week',
+    items: [
+      { value: 'day', label: 'Day' },
+      { value: 'week', label: 'Week' },
+      { value: 'month', label: 'Month' },
+      { value: 'year', label: 'Year' },
+    ],
+  },
+  {
+    name: 'view',
+    defaultValue: 'grid',
+    items: [
+      { value: 'grid', label: 'Grid' },
+      { value: 'list', label: 'List' },
+    ],
+  },
+  {
+    name: 'align',
+    defaultValue: 'center',
+    items: [
+      { value: 'left', label: 'Left' },
+      { value: 'center', label: 'Center' },
+      { value: 'right', label: 'Right' },
+    ],
+  },
+  {
+    name: 'sort',
+    defaultValue: 'newest',
+    size: 'sm',
+    items: [
+      { value: 'newest', label: 'Newest' },
+      { value: 'popular', label: 'Popular' },
+      { value: 'trending', label: 'Trending' },
+    ],
+  },
+  {
+    name: 'theme',
+    defaultValue: 'system',
+    items: [
+      { value: 'light', label: 'Light' },
+      { value: 'dark', label: 'Dark' },
+      { value: 'system', label: 'System' },
+    ],
+  },
+  {
+    name: 'unit',
+    defaultValue: 'metric',
+    size: 'sm',
+    items: [
+      { value: 'metric', label: 'Metric' },
+      { value: 'imperial', label: 'Imperial' },
+    ],
+  },
+  {
+    name: 'status',
+    defaultValue: 'all',
+    size: 'lg',
+    items: [
+      { value: 'all', label: 'All' },
+      { value: 'active', label: 'Active' },
+      { value: 'archived', label: 'Archived' },
+    ],
+  },
+]
+
+const INITIAL_GROUP_VALUES = Object.fromEntries(
+  DEMO_BUTTON_GROUPS.map(({ name, defaultValue }) => [name, defaultValue]),
+)
+
 function App() {
+  const [groupValues, setGroupValues] = useState(INITIAL_GROUP_VALUES)
+
+  const setGroupValue = (name: string, value: string) => {
+    setGroupValues((prev) => ({ ...prev, [name]: value }))
+  }
+
   return (
     <main className="app">
-      <h1 className="app__title">Liquid Glass Button</h1>
-      <div className="app__buttons">
-        {DEMO_BUTTONS.map(({ label, size, glassParams }) => (
-          <LiquidGlassButton key={label} size={size} glassParams={glassParams}>
-            {label}
-          </LiquidGlassButton>
-        ))}
-      </div>
+      <h1 className="app__title">Liquid Glass Components</h1>
+
+      <section className="app__section">
+        <h2 className="app__section-title">Button Group</h2>
+        <div className="app__row">
+          {DEMO_BUTTON_GROUPS.map(({ name, items, size }) => (
+            <LiquidGlassButtonGroup
+              key={name}
+              name={name}
+              size={size}
+              value={groupValues[name]}
+              onValueChange={(value) => setGroupValue(name, value)}
+            >
+              {items.map(({ value, label }) => (
+                <LiquidGlassButtonGroup.Item key={value} value={value}>
+                  {label}
+                </LiquidGlassButtonGroup.Item>
+              ))}
+            </LiquidGlassButtonGroup>
+          ))}
+        </div>
+      </section>
+
+      <section className="app__section">
+        <h2 className="app__section-title">Buttons</h2>
+        <div className="app__buttons">
+          {DEMO_BUTTONS.map(({ label, size, glassParams }) => (
+            <LiquidGlassButton key={label} size={size} glassParams={glassParams}>
+              {label}
+            </LiquidGlassButton>
+          ))}
+        </div>
+      </section>
+
       <p className="app__hint">
         不同 strength / edgeFalloff / borderRadius 预设，边缘折射强度与形状各异（建议
         Chrome 查看）
