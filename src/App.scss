@@ -1,22 +1,8 @@
 @use './styles/variables' as *;
 
-// 本地 + 远程多图拼接，便于观察玻璃边缘折射
-$demo-bg-images:
-  url('src/assets/HLB2RnXWcAAXjl4.jpeg');
-
-$demo-bg-positions: 0 0, 210px 160px, 320px 80px, 40px 240px;
-
-@keyframes move-background {
-  0% {
-    background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%;
-  }
-
-  100% {
-    background-position: 0% -1500%, 0% -1400%, 0% -1600%, 0% -1500%;
-  }
-}
-
 .app {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,10 +10,6 @@ $demo-bg-positions: 0 0, 210px 160px, 320px 80px, 40px 240px;
   gap: 24px;
   min-height: 100svh;
   padding: 48px 24px;
-  background-image: $demo-bg-images;
-  background-size: contain;
-  background-position: $demo-bg-positions;
-  background-repeat: repeat;
 }
 
 .app__buttons {

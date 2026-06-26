@@ -22,9 +22,23 @@ export interface UseLiquidGlassEffectResult<T extends HTMLElement> {
   borderRadius: number
 }
 
+function scheduleIdle(callback: () => void, timeout = 120): number {
+  if (typeof window.requestIdleCallback === 'function') {
+    return window.requestIdleCallback(() => callback(), { timeout })
+  }
+  return globalThis.setTimeout(callback, 1)
+}
+
+function cancelIdle(id: number) {
+  if (typeof window.cancelIdleCallback === 'function') {
+    window.cancelIdleCallback(id)
+  } else {
+    globalThis.clearTimeout(id)
+  }
+}
+
 export function useLiquidGlassEffect<T extends HTMLElement>(
   glassParams?: LiquidGlassParams,
-  observeDeps: unknown[] = [],
 ): UseLiquidGlassEffectResult<T> {
   const reactId = useId().replace(/:/g, '')
   const filterId = `liquid-glass-${reactId}`
@@ -34,21 +48,42 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
   const [mapUrl, setMapUrl] = useState('')
   const [filterSize, setFilterSize] = useState({ width: 0, height: 0 })
 
+  const lastSizeRef = useRef({ width: 0, height: 0 })
+  const idleIdRef = useRef<number | null>(null)
+  const measureRafRef = useRef<number | null>(null)
+  const debounceMeasureRef = useRef<number | null>(null)
+
+  const lastMapKeyRef = useRef('')
+
   const borderRadius = glassParams?.borderRadius ?? DEFAULT_BORDER_RADIUS
 
   const updateMap = useCallback(
     (width: number, height: number) => {
       if (width < 2 || height < 2) return
+
+      const mapKey = `${width}x${height}:${borderRadius}:${glassParams?.edgeFalloff ?? ''}:${glassParams?.strength ?? ''}`
+      if (lastMapKeyRef.current === mapKey) return
+
+      lastMapKeyRef.current = mapKey
+      lastSizeRef.current = { width, height }
       setFilterSize({ width, height })
-      setMapUrl(
-        generateDisplacementMap({
-          width,
-          height,
-          borderRadius,
-          edgeFalloff: glassParams?.edgeFalloff,
-          strength: glassParams?.strength,
-        }),
-      )
+
+      if (idleIdRef.current !== null) {
+        cancelIdle(idleIdRef.current)
+      }
+
+      idleIdRef.current = scheduleIdle(() => {
+        idleIdRef.current = null
+        setMapUrl(
+          generateDisplacementMap({
+            width,
+            height,
+            borderRadius,
+            edgeFalloff: glassParams?.edgeFalloff,
+            strength: glassParams?.strength,
+          }),
+        )
+      })
     },
     [borderRadius, glassParams?.edgeFalloff, glassParams?.strength],
   )
@@ -58,16 +93,44 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
     if (!el) return
 
     const measure = () => {
-      const { width, height } = el.getBoundingClientRect()
-      updateMap(Math.round(width), Math.round(height))
+      if (measureRafRef.current !== null) {
+        cancelAnimationFrame(measureRafRef.current)
+      }
+
+      measureRafRef.current = requestAnimationFrame(() => {
+        measureRafRef.current = null
+        const { width, height } = el.getBoundingClientRect()
+        const w = Math.round(width)
+        const h = Math.round(height)
+
+        if (debounceMeasureRef.current !== null) {
+          window.clearTimeout(debounceMeasureRef.current)
+        }
+
+        debounceMeasureRef.current = window.setTimeout(() => {
+          debounceMeasureRef.current = null
+          updateMap(w, h)
+        }, 32)
+      })
     }
 
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(el)
-    return () => observer.disconnect()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- observeDeps 由调用方传入（如 children）
-  }, [updateMap, ...observeDeps])
+
+    return () => {
+      observer.disconnect()
+      if (measureRafRef.current !== null) {
+        cancelAnimationFrame(measureRafRef.current)
+      }
+      if (idleIdRef.current !== null) {
+        cancelIdle(idleIdRef.current)
+      }
+      if (debounceMeasureRef.current !== null) {
+        window.clearTimeout(debounceMeasureRef.current)
+      }
+    }
+  }, [updateMap])
 
   const filterStyle = useMemo(
     (): CSSProperties => ({

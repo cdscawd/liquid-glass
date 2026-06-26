@@ -25,7 +25,7 @@ export function LiquidGlassButton({
   ...props
 }: LiquidGlassButtonProps) {
   const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLButtonElement>(glassParams, [children])
+    useLiquidGlassEffect<HTMLButtonElement>(glassParams)
 
   const sizeClass = size === 'md' ? '' : ` liquid-glass-button--${size}`
 

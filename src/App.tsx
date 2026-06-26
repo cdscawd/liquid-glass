@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CyberspaceBackground } from './components/CyberspaceBackground'
 import { LiquidGlassButton } from './components/LiquidGlassButton'
 import { LiquidGlassButtonGroup } from './components/LiquidGlassButtonGroup'
 import type { LiquidGlassParams } from './lib/liquid-glass'
@@ -406,7 +407,9 @@ function App() {
   }
 
   return (
-    <main className="app">
+    <>
+      <CyberspaceBackground />
+      <main className="app">
       <h1 className="app__title">Liquid Glass Components</h1>
 
       <section className="app__section">
@@ -453,10 +456,10 @@ function App() {
       </section>
 
       <p className="app__hint">
-        不同 strength / edgeFalloff / borderRadius 预设，边缘折射强度与形状各异（建议
-        Chrome 查看）
+        赛博隧道 Three.js 背景自动循环 · 玻璃折射建议在 Chrome 查看
       </p>
     </main>
+    </>
   )
 }
 

@@ -194,7 +194,7 @@ function LiquidGlassButtonGroupDefault({
   const { value, select } = useGroupValue(valueProp, defaultValue, onValueChange)
 
   const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams, [children, value, size])
+    useLiquidGlassEffect<HTMLDivElement>(glassParams)
 
   const sizeClass = size === 'md' ? '' : ` liquid-glass-button-group--${size}`
 
@@ -287,7 +287,7 @@ function LiquidGlassButtonGroupSlider({
   )
 
   const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams, [children, value, size])
+    useLiquidGlassEffect<HTMLDivElement>(glassParams)
 
   const activeLayout = itemLayouts.find((item) => item.value === value)
   const activeThumb = activeLayout ? getThumbRect(activeLayout) : null
@@ -319,11 +319,7 @@ function LiquidGlassButtonGroupSlider({
     mapUrl: thumbMapUrl,
     filterSize: thumbFilterSize,
     filterStyle: thumbFilterStyle,
-  } = useLiquidGlassEffect<HTMLDivElement>(resolvedThumbGlassParams, [
-    thumbRect?.width,
-    thumbRect?.height,
-    isDragging,
-  ])
+  } = useLiquidGlassEffect<HTMLDivElement>(resolvedThumbGlassParams)
 
   const measureItems = useCallback(() => {
     const track = trackRef.current

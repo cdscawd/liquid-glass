@@ -3,6 +3,8 @@
 .liquid-glass-button {
   position: relative;
   display: inline-flex;
+  contain: layout style paint;
+  isolation: isolate;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -24,14 +26,14 @@
     $glass-shadow-inner 0 -10px 25px inset;
   transition:
     background-color 0.2s ease,
-    transform 0.15s ease;
+    opacity 0.15s ease;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
   }
 
   &:active {
-    transform: scale(0.98);
+    opacity: 0.88;
   }
 
   &:focus-visible {
