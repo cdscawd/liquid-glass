@@ -7,10 +7,52 @@
   overflow: hidden;
   border: 1px solid $glass-border;
   border-radius: $glass-radius;
-  background: rgba(255, 255, 255, 0.06);
   box-shadow:
     $glass-shadow-outer 0 4px 8px,
     $glass-shadow-inner 0 -10px 25px inset;
+
+  &--default {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &--slider {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  &__track {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+    padding: 3px;
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+
+    &--dragging {
+      cursor: grabbing;
+    }
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.35) inset,
+      0 8px 20px rgba(0, 0, 0, 0.18),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    will-change: transform, width;
+    transition:
+      transform 0.42s cubic-bezier(0.34, 1.28, 0.64, 1),
+      width 0.42s cubic-bezier(0.34, 1.28, 0.64, 1);
+
+    &--dragging {
+      transition: none;
+    }
+  }
 
   &__item {
     position: relative;
@@ -21,32 +63,12 @@
     min-height: 40px;
     padding: 10px 20px;
     border: none;
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
     background: transparent;
-    color: rgba(255, 255, 255, 0.75);
     font-family: $font-sans;
     font-size: 14px;
     font-weight: 500;
     line-height: 1.25;
     white-space: nowrap;
-    cursor: pointer;
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
-
-    &:first-child {
-      border-left: none;
-    }
-
-    &:hover:not(:disabled):not(&--selected) {
-      background: rgba(255, 255, 255, 0.06);
-      color: #fff;
-    }
-
-    &--selected {
-      background: rgba(255, 255, 255, 0.14);
-      color: #fff;
-    }
 
     &:focus-visible {
       outline: 2px solid rgba(255, 255, 255, 0.45);
@@ -69,6 +91,44 @@
       min-height: 48px;
       padding: 12px 28px;
       font-size: 16px;
+    }
+  }
+
+  &--default &__item {
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &:hover:not(:disabled):not(&--selected) {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+    }
+
+    &--selected {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+  }
+
+  &--slider &__item {
+    z-index: 2;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: inherit;
+    transition: color 0.25s ease;
+
+    &:hover:not(:disabled):not(&--selected) {
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    &--selected {
+      color: #fff;
     }
   }
 }

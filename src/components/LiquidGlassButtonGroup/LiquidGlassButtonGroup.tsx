@@ -1,12 +1,19 @@
 import {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
   useState,
   type ButtonHTMLAttributes,
   type HTMLAttributes,
   type ReactNode,
+  type RefObject,
 } from 'react'
 import {
+  DEFAULT_BORDER_RADIUS,
   LiquidGlassFilter,
   useLiquidGlassEffect,
   type LiquidGlassParams,
@@ -14,8 +21,21 @@ import {
 import './LiquidGlassButtonGroup.scss'
 
 export type LiquidGlassButtonGroupSize = 'sm' | 'md' | 'lg'
+export type LiquidGlassButtonGroupVariant = 'default' | 'slider'
 
-export interface LiquidGlassButtonGroupProps
+const THUMB_INSET = 3
+const DRAG_THRESHOLD = 4
+
+interface ItemLayout {
+  value: string
+  disabled: boolean
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
+interface LiquidGlassButtonGroupBaseProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   glassParams?: LiquidGlassParams
   size?: LiquidGlassButtonGroupSize
@@ -26,12 +46,32 @@ export interface LiquidGlassButtonGroupProps
   children: ReactNode
 }
 
+export interface LiquidGlassButtonGroupDefaultProps
+  extends LiquidGlassButtonGroupBaseProps {
+  variant?: 'default'
+  thumbGlassParams?: never
+}
+
+export interface LiquidGlassButtonGroupSliderProps
+  extends LiquidGlassButtonGroupBaseProps {
+  variant: 'slider'
+  thumbGlassParams?: LiquidGlassParams
+}
+
+export type LiquidGlassButtonGroupProps =
+  | LiquidGlassButtonGroupDefaultProps
+  | LiquidGlassButtonGroupSliderProps
+
 interface ButtonGroupContextValue {
   value: string | undefined
   name?: string
   size: LiquidGlassButtonGroupSize
+  isDragging: boolean
+  ignoreClickRef: RefObject<boolean>
   select: (value: string) => void
 }
+
+const noopIgnoreClickRef = { current: false }
 
 const ButtonGroupContext = createContext<ButtonGroupContextValue | null>(null)
 
@@ -53,11 +93,11 @@ function LiquidGlassButtonGroupItem({
   className = '',
   disabled,
   children,
+  onClick,
   ...props
 }: LiquidGlassButtonGroupItemProps) {
-  const { value: selectedValue, name, size, select } = useButtonGroupContext(
-    'LiquidGlassButtonGroup.Item',
-  )
+  const { value: selectedValue, name, size, isDragging, ignoreClickRef, select } =
+    useButtonGroupContext('LiquidGlassButtonGroup.Item')
   const selected = selectedValue === value
   const sizeClass =
     size === 'md' ? '' : ` liquid-glass-button-group__item--${size}`
@@ -68,11 +108,22 @@ function LiquidGlassButtonGroupItem({
       role="radio"
       name={name}
       value={value}
+      data-lg-group-item={value}
+      data-lg-group-disabled={disabled ? 'true' : undefined}
       aria-checked={selected}
       disabled={disabled}
       className={`liquid-glass-button-group__item${selected ? ' liquid-glass-button-group__item--selected' : ''}${sizeClass}${className ? ` ${className}` : ''}`}
-      onClick={() => {
-        if (!disabled) select(value)
+      onClick={(event) => {
+        onClick?.(event)
+        if (
+          event.defaultPrevented ||
+          disabled ||
+          isDragging ||
+          ignoreClickRef.current
+        ) {
+          return
+        }
+        select(value)
       }}
       {...props}
     >
@@ -81,7 +132,54 @@ function LiquidGlassButtonGroupItem({
   )
 }
 
-export function LiquidGlassButtonGroup({
+function getThumbRadius(borderRadius: number, height: number): number {
+  if (borderRadius >= 999 || borderRadius >= height / 2) return 999
+  return Math.max(0, borderRadius - THUMB_INSET)
+}
+
+function findNearestItem(items: ItemLayout[], centerX: number): ItemLayout | undefined {
+  const enabled = items.filter((item) => !item.disabled)
+  if (enabled.length === 0) return undefined
+
+  return enabled.reduce((nearest, item) => {
+    const itemCenter = item.left + item.width / 2
+    const nearestCenter = nearest.left + nearest.width / 2
+    return Math.abs(itemCenter - centerX) < Math.abs(nearestCenter - centerX)
+      ? item
+      : nearest
+  })
+}
+
+function getThumbRect(layout: ItemLayout) {
+  return {
+    left: layout.left + THUMB_INSET,
+    top: layout.top + THUMB_INSET,
+    width: Math.max(layout.width - THUMB_INSET * 2, 0),
+    height: Math.max(layout.height - THUMB_INSET * 2, 0),
+  }
+}
+
+function useGroupValue(
+  valueProp: string | undefined,
+  defaultValue: string | undefined,
+  onValueChange?: (value: string) => void,
+) {
+  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue)
+  const isControlled = valueProp !== undefined
+  const value = isControlled ? valueProp : uncontrolledValue
+
+  const select = useCallback(
+    (next: string) => {
+      if (!isControlled) setUncontrolledValue(next)
+      onValueChange?.(next)
+    },
+    [isControlled, onValueChange],
+  )
+
+  return { value, select }
+}
+
+function LiquidGlassButtonGroupDefault({
   glassParams,
   size = 'md',
   value: valueProp,
@@ -92,18 +190,11 @@ export function LiquidGlassButtonGroup({
   style,
   children,
   ...props
-}: LiquidGlassButtonGroupProps) {
-  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue)
-  const isControlled = valueProp !== undefined
-  const value = isControlled ? valueProp : uncontrolledValue
-
-  const select = (next: string) => {
-    if (!isControlled) setUncontrolledValue(next)
-    onValueChange?.(next)
-  }
+}: LiquidGlassButtonGroupDefaultProps) {
+  const { value, select } = useGroupValue(valueProp, defaultValue, onValueChange)
 
   const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams, [children, value])
+    useLiquidGlassEffect<HTMLDivElement>(glassParams, [children, value, size])
 
   const sizeClass = size === 'md' ? '' : ` liquid-glass-button-group--${size}`
 
@@ -120,7 +211,7 @@ export function LiquidGlassButtonGroup({
         ref={hostRef}
         role="radiogroup"
         aria-label={name}
-        className={`liquid-glass-button-group${sizeClass}${className ? ` ${className}` : ''}`}
+        className={`liquid-glass-button-group liquid-glass-button-group--default${sizeClass}${className ? ` ${className}` : ''}`}
         style={{
           ...filterStyle,
           borderRadius,
@@ -128,12 +219,344 @@ export function LiquidGlassButtonGroup({
         }}
         {...props}
       >
-        <ButtonGroupContext.Provider value={{ value, name, size, select }}>
+        <ButtonGroupContext.Provider
+          value={{
+            value,
+            name,
+            size,
+            isDragging: false,
+            ignoreClickRef: noopIgnoreClickRef,
+            select,
+          }}
+        >
           {children}
         </ButtonGroupContext.Provider>
       </div>
     </>
   )
+}
+
+function LiquidGlassButtonGroupSlider({
+  glassParams,
+  thumbGlassParams,
+  size = 'md',
+  value: valueProp,
+  defaultValue,
+  onValueChange,
+  name,
+  className = '',
+  style,
+  children,
+  ...props
+}: LiquidGlassButtonGroupSliderProps) {
+  const { value, select: baseSelect } = useGroupValue(
+    valueProp,
+    defaultValue,
+    onValueChange,
+  )
+
+  const [itemLayouts, setItemLayouts] = useState<ItemLayout[]>([])
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragThumb, setDragThumb] = useState<{
+    left: number
+    top: number
+    width: number
+    height: number
+  } | null>(null)
+
+  const trackRef = useRef<HTMLDivElement>(null)
+  const dragStateRef = useRef<{
+    pointerId: number
+    startX: number
+    startThumbLeft: number
+    thumbWidth: number
+    thumbTop: number
+    thumbHeight: number
+    didDrag: boolean
+  } | null>(null)
+  const didDragRef = useRef(false)
+  const ignoreClickRef = useRef(false)
+
+  const select = useCallback(
+    (next: string) => {
+      const target = itemLayouts.find((item) => item.value === next)
+      if (target?.disabled) return
+      baseSelect(next)
+    },
+    [baseSelect, itemLayouts],
+  )
+
+  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
+    useLiquidGlassEffect<HTMLDivElement>(glassParams, [children, value, size])
+
+  const activeLayout = itemLayouts.find((item) => item.value === value)
+  const activeThumb = activeLayout ? getThumbRect(activeLayout) : null
+  const thumbRect = dragThumb ?? activeThumb
+  const thumbRadius = getThumbRadius(
+    thumbGlassParams?.borderRadius ?? glassParams?.borderRadius ?? DEFAULT_BORDER_RADIUS,
+    thumbRect?.height ?? 0,
+  )
+
+  const resolvedThumbGlassParams = useMemo(
+    (): LiquidGlassParams => ({
+      borderRadius: thumbRadius,
+      edgeFalloff: thumbGlassParams?.edgeFalloff ?? glassParams?.edgeFalloff,
+      strength: thumbGlassParams?.strength ?? glassParams?.strength ?? 1.15,
+    }),
+    [
+      glassParams?.edgeFalloff,
+      glassParams?.strength,
+      thumbGlassParams?.edgeFalloff,
+      thumbGlassParams?.strength,
+      thumbRadius,
+    ],
+  )
+
+  const {
+    hostRef: thumbRef,
+    filterId: thumbFilterId,
+    mapId: thumbMapId,
+    mapUrl: thumbMapUrl,
+    filterSize: thumbFilterSize,
+    filterStyle: thumbFilterStyle,
+  } = useLiquidGlassEffect<HTMLDivElement>(resolvedThumbGlassParams, [
+    thumbRect?.width,
+    thumbRect?.height,
+    isDragging,
+  ])
+
+  const measureItems = useCallback(() => {
+    const track = trackRef.current
+    if (!track) return
+
+    const trackRect = track.getBoundingClientRect()
+    const buttons = track.querySelectorAll<HTMLButtonElement>('[data-lg-group-item]')
+
+    setItemLayouts(
+      Array.from(buttons).map((button) => {
+        const rect = button.getBoundingClientRect()
+        return {
+          value: button.dataset.lgGroupItem ?? '',
+          disabled: button.dataset.lgGroupDisabled === 'true',
+          left: rect.left - trackRect.left,
+          top: rect.top - trackRect.top,
+          width: rect.width,
+          height: rect.height,
+        }
+      }),
+    )
+  }, [])
+
+  useLayoutEffect(() => {
+    measureItems()
+    const track = trackRef.current
+    const group = hostRef.current
+    if (!track || !group) return
+
+    const observer = new ResizeObserver(measureItems)
+    observer.observe(group)
+    observer.observe(track)
+    return () => observer.disconnect()
+  // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [children, measureItems, value, size])
+
+  const clampThumbLeft = useCallback(
+    (left: number, width: number) => {
+      if (itemLayouts.length === 0) return left
+      const first = getThumbRect(itemLayouts[0]!)
+      const last = getThumbRect(itemLayouts[itemLayouts.length - 1]!)
+      const minLeft = first.left
+      const maxLeft = last.left + last.width - width
+      return Math.min(Math.max(left, minLeft), maxLeft)
+    },
+    [itemLayouts],
+  )
+
+  const finishDrag = useCallback(
+    (clientX: number) => {
+      const track = trackRef.current
+      if (!track || itemLayouts.length === 0) return
+
+      const trackRect = track.getBoundingClientRect()
+      const nearest = findNearestItem(itemLayouts, clientX - trackRect.left)
+      if (nearest) select(nearest.value)
+    },
+    [itemLayouts, select],
+  )
+
+  const endDragSession = useCallback(
+    (clientX?: number) => {
+      const dragState = dragStateRef.current
+      const track = trackRef.current
+
+      if (!dragState) {
+        setIsDragging(false)
+        setDragThumb(null)
+        return
+      }
+
+      if (track?.hasPointerCapture(dragState.pointerId)) {
+        track.releasePointerCapture(dragState.pointerId)
+      }
+
+      if (clientX !== undefined) {
+        if (dragState.didDrag) {
+          finishDrag(clientX)
+        } else {
+          const trackRect = track!.getBoundingClientRect()
+          const target = findNearestItem(itemLayouts, clientX - trackRect.left)
+          if (target) select(target.value)
+        }
+      }
+
+      const wasDrag = dragState.didDrag
+      dragStateRef.current = null
+      setIsDragging(false)
+      setDragThumb(null)
+
+      if (wasDrag) {
+        didDragRef.current = true
+        ignoreClickRef.current = true
+        window.setTimeout(() => {
+          didDragRef.current = false
+          ignoreClickRef.current = false
+        }, 0)
+      } else {
+        didDragRef.current = false
+        ignoreClickRef.current = false
+      }
+    },
+    [finishDrag, itemLayouts, select],
+  )
+
+  const handleTrackPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || !activeThumb || dragStateRef.current) return
+
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startThumbLeft: activeThumb.left,
+      thumbWidth: activeThumb.width,
+      thumbTop: activeThumb.top,
+      thumbHeight: activeThumb.height,
+      didDrag: false,
+    }
+    setIsDragging(true)
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const onPointerMove = (event: PointerEvent) => {
+      const dragState = dragStateRef.current
+      if (!dragState || event.pointerId !== dragState.pointerId) return
+
+      const deltaX = event.clientX - dragState.startX
+      if (!dragState.didDrag && Math.abs(deltaX) >= DRAG_THRESHOLD) {
+        dragState.didDrag = true
+      }
+
+      if (!dragState.didDrag) return
+
+      setDragThumb({
+        left: clampThumbLeft(
+          dragState.startThumbLeft + deltaX,
+          dragState.thumbWidth,
+        ),
+        top: dragState.thumbTop,
+        width: dragState.thumbWidth,
+        height: dragState.thumbHeight,
+      })
+    }
+
+    const onPointerEnd = (event: PointerEvent) => {
+      const dragState = dragStateRef.current
+      if (!dragState || event.pointerId !== dragState.pointerId) return
+      endDragSession(event.clientX)
+    }
+
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerEnd)
+    window.addEventListener('pointercancel', onPointerEnd)
+
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerup', onPointerEnd)
+      window.removeEventListener('pointercancel', onPointerEnd)
+    }
+  }, [isDragging, clampThumbLeft, endDragSession])
+
+  const sizeClass = size === 'md' ? '' : ` liquid-glass-button-group--${size}`
+
+  return (
+    <>
+      <LiquidGlassFilter
+        filterId={filterId}
+        mapId={mapId}
+        mapUrl={mapUrl}
+        width={filterSize.width}
+        height={filterSize.height}
+      />
+      {thumbRect && (
+        <LiquidGlassFilter
+          filterId={thumbFilterId}
+          mapId={thumbMapId}
+          mapUrl={thumbMapUrl}
+          width={thumbFilterSize.width}
+          height={thumbFilterSize.height}
+        />
+      )}
+      <div
+        ref={hostRef}
+        role="radiogroup"
+        aria-label={name}
+        className={`liquid-glass-button-group liquid-glass-button-group--slider${sizeClass}${className ? ` ${className}` : ''}`}
+        style={{
+          ...filterStyle,
+          borderRadius,
+          ...style,
+        }}
+        {...props}
+      >
+        <div
+          ref={trackRef}
+          className={`liquid-glass-button-group__track${isDragging ? ' liquid-glass-button-group__track--dragging' : ''}`}
+          onPointerDown={handleTrackPointerDown}
+          onLostPointerCapture={() => {
+            if (dragStateRef.current) endDragSession()
+          }}
+        >
+          {thumbRect && (
+            <div
+              ref={thumbRef}
+              className={`liquid-glass-button-group__thumb${isDragging ? ' liquid-glass-button-group__thumb--dragging' : ''}`}
+              aria-hidden
+              style={{
+                ...thumbFilterStyle,
+                width: thumbRect.width,
+                height: thumbRect.height,
+                transform: `translate3d(${thumbRect.left}px, ${thumbRect.top}px, 0)`,
+                borderRadius: thumbRadius >= 999 ? '999px' : `${thumbRadius}px`,
+              }}
+            />
+          )}
+          <ButtonGroupContext.Provider
+            value={{ value, name, size, isDragging, ignoreClickRef, select }}
+          >
+            {children}
+          </ButtonGroupContext.Provider>
+        </div>
+      </div>
+    </>
+  )
+}
+
+export function LiquidGlassButtonGroup(props: LiquidGlassButtonGroupProps) {
+  if (props.variant === 'slider') {
+    return <LiquidGlassButtonGroupSlider {...props} />
+  }
+  return <LiquidGlassButtonGroupDefault {...props} variant="default" />
 }
 
 LiquidGlassButtonGroup.Item = LiquidGlassButtonGroupItem
