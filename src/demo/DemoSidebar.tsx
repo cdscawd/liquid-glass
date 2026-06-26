@@ -21,7 +21,7 @@ export function DemoSidebar({ activeId, onNavigate }: DemoSidebarProps) {
       glassParams={{ borderRadius: 12, strength: 0.85, edgeFalloff: 14 }}
     >
       <div className="demo-sidebar__brand">
-        <AvatarLiquidGlass fallback="LG" size="sm" />
+        <AvatarLiquidGlass fallback="Gat" />
         <div className="demo-sidebar__brand-text">
           <div className="demo-sidebar__title">Liquid Glass</div>
           <BadgeLiquidGlass variant="chip" size="sm">
