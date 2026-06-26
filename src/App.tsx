@@ -410,55 +410,55 @@ function App() {
     <>
       <CyberspaceBackground />
       <main className="app">
-      <h1 className="app__title">Liquid Glass Components</h1>
+        <h1 className="app__title">Liquid Glass Components</h1>
 
-      <section className="app__section">
-        <h2 className="app__section-title">Button Group</h2>
-
-        <div className="app__group-block">
-          <h3 className="app__group-block-title">default · 项内选中高亮</h3>
-          <p className="app__section-hint">默认变体，点击切换，支持 sm / md / lg 与多种 glassParams</p>
-          <div className="app__group-grid">
-            {DEMO_BUTTON_GROUPS.filter((d) => d.category === 'default').map((demo) =>
-              renderButtonGroup(
-                demo,
-                groupValues[demo.name],
-                (value) => setGroupValue(demo.name, value),
-              ),
-            )}
+        <section className="app__section">
+          <h2 className="app__section-title">Buttons</h2>
+          <div className="app__buttons">
+            {DEMO_BUTTONS.map(({ label, size, glassParams }) => (
+              <LiquidGlassButton key={label} size={size} glassParams={glassParams}>
+                {label}
+              </LiquidGlassButton>
+            ))}
           </div>
-        </div>
+        </section>
 
-        <div className="app__group-block">
-          <h3 className="app__group-block-title">slider · 滑动玻璃指示器</h3>
-          <p className="app__section-hint">variant=&quot;slider&quot;，点击切换带动画，按住拖拽后松手吸附</p>
-          <div className="app__group-grid">
-            {DEMO_BUTTON_GROUPS.filter((d) => d.category === 'slider').map((demo) =>
-              renderButtonGroup(
-                demo,
-                groupValues[demo.name],
-                (value) => setGroupValue(demo.name, value),
-              ),
-            )}
+        <section className="app__section">
+          <h2 className="app__section-title">Button Group</h2>
+
+          <div className="app__group-block">
+            <h3 className="app__group-block-title">default · 项内选中高亮</h3>
+            <p className="app__section-hint">默认变体，点击切换，支持 sm / md / lg 与多种 glassParams</p>
+            <div className="app__group-grid">
+              {DEMO_BUTTON_GROUPS.filter((d) => d.category === 'default').map((demo) =>
+                renderButtonGroup(
+                  demo,
+                  groupValues[demo.name],
+                  (value) => setGroupValue(demo.name, value),
+                ),
+              )}
+            </div>
           </div>
-        </div>
-      </section>
 
-      <section className="app__section">
-        <h2 className="app__section-title">Buttons</h2>
-        <div className="app__buttons">
-          {DEMO_BUTTONS.map(({ label, size, glassParams }) => (
-            <LiquidGlassButton key={label} size={size} glassParams={glassParams}>
-              {label}
-            </LiquidGlassButton>
-          ))}
-        </div>
-      </section>
+          <div className="app__group-block">
+            <h3 className="app__group-block-title">slider · 滑动玻璃指示器</h3>
+            <p className="app__section-hint">variant=&quot;slider&quot;，点击切换带动画，按住拖拽后松手吸附</p>
+            <div className="app__group-grid">
+              {DEMO_BUTTON_GROUPS.filter((d) => d.category === 'slider').map((demo) =>
+                renderButtonGroup(
+                  demo,
+                  groupValues[demo.name],
+                  (value) => setGroupValue(demo.name, value),
+                ),
+              )}
+            </div>
+          </div>
+        </section>
 
-      <p className="app__hint">
-        赛博隧道 Three.js 背景自动循环 · 玻璃折射建议在 Chrome 查看
-      </p>
-    </main>
+        <p className="app__hint">
+          赛博隧道 Three.js 背景自动循环 · 玻璃折射建议在 Chrome 查看
+        </p>
+      </main>
     </>
   )
 }

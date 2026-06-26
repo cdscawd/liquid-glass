@@ -257,6 +257,7 @@ function LiquidGlassButtonGroupSlider({
 
   const [itemLayouts, setItemLayouts] = useState<ItemLayout[]>([])
   const [isDragging, setIsDragging] = useState(false)
+  const [dragSessionId, setDragSessionId] = useState(0)
   const [dragThumb, setDragThumb] = useState<{
     left: number
     top: number
@@ -273,17 +274,22 @@ function LiquidGlassButtonGroupSlider({
     thumbTop: number
     thumbHeight: number
     didDrag: boolean
+    tapItemValue?: string
+    lastClientX: number
   } | null>(null)
   const didDragRef = useRef(false)
   const ignoreClickRef = useRef(false)
+  const itemLayoutsRef = useRef<ItemLayout[]>([])
 
   const select = useCallback(
     (next: string) => {
-      const target = itemLayouts.find((item) => item.value === next)
+      const layouts = itemLayoutsRef.current
+      const target = layouts.find((item) => item.value === next)
       if (target?.disabled) return
+      if (target === undefined && layouts.length > 0) return
       baseSelect(next)
     },
-    [baseSelect, itemLayouts],
+    [baseSelect],
   )
 
   const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
@@ -328,19 +334,20 @@ function LiquidGlassButtonGroupSlider({
     const trackRect = track.getBoundingClientRect()
     const buttons = track.querySelectorAll<HTMLButtonElement>('[data-lg-group-item]')
 
-    setItemLayouts(
-      Array.from(buttons).map((button) => {
-        const rect = button.getBoundingClientRect()
-        return {
-          value: button.dataset.lgGroupItem ?? '',
-          disabled: button.dataset.lgGroupDisabled === 'true',
-          left: rect.left - trackRect.left,
-          top: rect.top - trackRect.top,
-          width: rect.width,
-          height: rect.height,
-        }
-      }),
-    )
+    const layouts = Array.from(buttons).map((button) => {
+      const rect = button.getBoundingClientRect()
+      return {
+        value: button.dataset.lgGroupItem ?? '',
+        disabled: button.dataset.lgGroupDisabled === 'true',
+        left: rect.left - trackRect.left,
+        top: rect.top - trackRect.top,
+        width: rect.width,
+        height: rect.height,
+      }
+    })
+
+    setItemLayouts(layouts)
+    itemLayoutsRef.current = layouts
   }, [])
 
   useLayoutEffect(() => {
@@ -371,13 +378,14 @@ function LiquidGlassButtonGroupSlider({
   const finishDrag = useCallback(
     (clientX: number) => {
       const track = trackRef.current
-      if (!track || itemLayouts.length === 0) return
+      const layouts = itemLayoutsRef.current
+      if (!track || layouts.length === 0) return
 
       const trackRect = track.getBoundingClientRect()
-      const nearest = findNearestItem(itemLayouts, clientX - trackRect.left)
+      const nearest = findNearestItem(layouts, clientX - trackRect.left)
       if (nearest) select(nearest.value)
     },
-    [itemLayouts, select],
+    [select],
   )
 
   const endDragSession = useCallback(
@@ -391,16 +399,21 @@ function LiquidGlassButtonGroupSlider({
         return
       }
 
+      const resolvedClientX = clientX ?? dragState.lastClientX
+
       if (track?.hasPointerCapture(dragState.pointerId)) {
         track.releasePointerCapture(dragState.pointerId)
       }
 
-      if (clientX !== undefined) {
+      if (resolvedClientX !== undefined) {
         if (dragState.didDrag) {
-          finishDrag(clientX)
+          finishDrag(resolvedClientX)
+        } else if (dragState.tapItemValue) {
+          select(dragState.tapItemValue)
         } else {
           const trackRect = track!.getBoundingClientRect()
-          const target = findNearestItem(itemLayouts, clientX - trackRect.left)
+          const layouts = itemLayoutsRef.current
+          const target = findNearestItem(layouts, resolvedClientX - trackRect.left)
           if (target) select(target.value)
         }
       }
@@ -419,14 +432,21 @@ function LiquidGlassButtonGroupSlider({
         }, 0)
       } else {
         didDragRef.current = false
-        ignoreClickRef.current = false
+        ignoreClickRef.current = true
+        window.setTimeout(() => {
+          ignoreClickRef.current = false
+        }, 0)
       }
     },
-    [finishDrag, itemLayouts, select],
+    [finishDrag, select],
   )
 
   const handleTrackPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0 || !activeThumb || dragStateRef.current) return
+
+    const itemEl = (event.target as HTMLElement).closest<HTMLButtonElement>(
+      '[data-lg-group-item]',
+    )
 
     dragStateRef.current = {
       pointerId: event.pointerId,
@@ -436,39 +456,41 @@ function LiquidGlassButtonGroupSlider({
       thumbTop: activeThumb.top,
       thumbHeight: activeThumb.height,
       didDrag: false,
+      tapItemValue: itemEl?.dataset.lgGroupItem,
+      lastClientX: event.clientX,
     }
-    setIsDragging(true)
+    setDragSessionId((id) => id + 1)
     event.currentTarget.setPointerCapture(event.pointerId)
   }
 
   useEffect(() => {
-    if (!isDragging) return
+    if (dragSessionId === 0 || !dragStateRef.current) return
 
     const onPointerMove = (event: PointerEvent) => {
-      const dragState = dragStateRef.current
-      if (!dragState || event.pointerId !== dragState.pointerId) return
+      const state = dragStateRef.current
+      if (!state || event.pointerId !== state.pointerId) return
 
-      const deltaX = event.clientX - dragState.startX
-      if (!dragState.didDrag && Math.abs(deltaX) >= DRAG_THRESHOLD) {
-        dragState.didDrag = true
+      state.lastClientX = event.clientX
+
+      const deltaX = event.clientX - state.startX
+      if (!state.didDrag && Math.abs(deltaX) >= DRAG_THRESHOLD) {
+        state.didDrag = true
+        setIsDragging(true)
       }
 
-      if (!dragState.didDrag) return
+      if (!state.didDrag) return
 
       setDragThumb({
-        left: clampThumbLeft(
-          dragState.startThumbLeft + deltaX,
-          dragState.thumbWidth,
-        ),
-        top: dragState.thumbTop,
-        width: dragState.thumbWidth,
-        height: dragState.thumbHeight,
+        left: clampThumbLeft(state.startThumbLeft + deltaX, state.thumbWidth),
+        top: state.thumbTop,
+        width: state.thumbWidth,
+        height: state.thumbHeight,
       })
     }
 
     const onPointerEnd = (event: PointerEvent) => {
-      const dragState = dragStateRef.current
-      if (!dragState || event.pointerId !== dragState.pointerId) return
+      const state = dragStateRef.current
+      if (!state || event.pointerId !== state.pointerId) return
       endDragSession(event.clientX)
     }
 
@@ -481,7 +503,7 @@ function LiquidGlassButtonGroupSlider({
       window.removeEventListener('pointerup', onPointerEnd)
       window.removeEventListener('pointercancel', onPointerEnd)
     }
-  }, [isDragging, clampThumbLeft, endDragSession])
+  }, [dragSessionId, clampThumbLeft, endDragSession])
 
   const sizeClass = size === 'md' ? '' : ` liquid-glass-button-group--${size}`
 
