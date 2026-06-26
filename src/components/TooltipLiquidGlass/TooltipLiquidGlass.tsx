@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type ReactNode, useRef, useState } from 'react'
+import { type HTMLAttributes, type ReactNode, useCallback, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   LiquidGlassFilter,
@@ -6,6 +6,7 @@ import {
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
+import { useAnchorFollowPosition } from '../../lib/useAnchorFollowPosition'
 import './TooltipLiquidGlass.scss'
 
 export interface TooltipLiquidGlassProps
@@ -26,25 +27,22 @@ export function TooltipLiquidGlass({
   ...props
 }: TooltipLiquidGlassProps) {
   const [visible, setVisible] = useState(false)
-  const [position, setPosition] = useState({ top: 0, left: 0 })
   const anchorRef = useRef<HTMLSpanElement>(null)
+
+  const measurePosition = useCallback(
+    (rect: DOMRect) => ({
+      top: rect.top - 8,
+      left: rect.left + rect.width / 2,
+    }),
+    [],
+  )
+
+  const position = useAnchorFollowPosition(anchorRef, visible, measurePosition)
 
   const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'tooltip-liquid-glass', variant })
 
-  const updatePosition = () => {
-    const rect = anchorRef.current?.getBoundingClientRect()
-    if (!rect) return
-    setPosition({
-      top: rect.top - 8,
-      left: rect.left + rect.width / 2,
-    })
-  }
-
-  const show = () => {
-    updatePosition()
-    setVisible(true)
-  }
+  const show = () => setVisible(true)
 
   return (
     <>

@@ -51,6 +51,7 @@ import {
 } from '../components'
 import type { LiquidGlassParams } from '../lib/liquid-glass'
 import { DemoBlock } from './DemoBlock'
+import { DemoGlassControls } from './DemoGlassControls'
 import {
   DEMO_BUTTON_GROUPS,
   DEMO_BUTTONS,
@@ -174,30 +175,17 @@ export function ThemeSection({ globalGlass, onThemeChange }: ThemeSectionProps) 
       propsHint="glassParams: { borderRadius?, strength?, edgeFalloff? }"
     >
       <DemoBlock
-        title="Provider 主题预设"
-        description="点击切换全局折射参数，观察下方所有组件联动变化"
+        title="Provider 全局参数"
+        description="左侧边栏底部可实时调节；此处同步展示当前 Provider 注入值"
         code={`<LiquidGlassProvider glassParams={${formatGlassParams(globalGlass) || '{ ... }'}}>
   <App />
 </LiquidGlassProvider>`}
       >
-        <ButtonLiquidGlass
-          size="sm"
-          onClick={() => onThemeChange({ borderRadius: 8, strength: 1, edgeFalloff: 14 })}
-        >
-          Default
-        </ButtonLiquidGlass>
-        <ButtonLiquidGlass
-          size="sm"
-          onClick={() => onThemeChange({ borderRadius: 12, strength: 1.35, edgeFalloff: 20 })}
-        >
-          Strong
-        </ButtonLiquidGlass>
-        <ButtonLiquidGlass
-          size="sm"
-          onClick={() => onThemeChange({ borderRadius: 999, strength: 0.85, edgeFalloff: 16 })}
-        >
-          Pill Soft
-        </ButtonLiquidGlass>
+        <DemoGlassControls
+          className="demo-theme-controls"
+          value={globalGlass}
+          onChange={onThemeChange}
+        />
       </DemoBlock>
 
       {GLASS_PRESETS.map((preset) => (

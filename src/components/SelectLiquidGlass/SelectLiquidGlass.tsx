@@ -15,6 +15,7 @@ import {
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
 import { DEFAULT_BORDER_RADIUS } from '../../lib/liquid-glass/constants'
+import { useAnchorFollowPosition } from '../../lib/useAnchorFollowPosition'
 import './SelectLiquidGlass.scss'
 
 export type SelectLiquidGlassSize = 'sm' | 'md' | 'lg'
@@ -70,7 +71,6 @@ export function SelectLiquidGlass({
   const value = isControlled ? valueProp : uncontrolled
 
   const [open, setOpen] = useState(false)
-  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 })
 
   const {
     hostRef: triggerHostRef,
@@ -104,28 +104,17 @@ export function SelectLiquidGlass({
     variant,
   })
 
-  const updatePosition = useCallback(() => {
-    const el = triggerHostRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    setPosition({
-      top: rect.bottom + 6,
-      left: rect.left,
-      width: rect.width,
-    })
-  }, [])
+  const measurePosition = useCallback((rect: DOMRect) => ({
+    top: rect.bottom + 6,
+    left: rect.left,
+    width: rect.width,
+  }), [])
 
-  useEffect(() => {
-    if (!open) return
-    updatePosition()
-    const onScrollOrResize = () => updatePosition()
-    window.addEventListener('scroll', onScrollOrResize, true)
-    window.addEventListener('resize', onScrollOrResize)
-    return () => {
-      window.removeEventListener('scroll', onScrollOrResize, true)
-      window.removeEventListener('resize', onScrollOrResize)
-    }
-  }, [open, updatePosition])
+  const position = useAnchorFollowPosition(
+    triggerHostRef,
+    open && !disabled,
+    measurePosition,
+  )
 
   useEffect(() => {
     if (!open) return

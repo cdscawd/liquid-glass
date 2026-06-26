@@ -1,0 +1,101 @@
+@use '../styles/variables' as *;
+
+.demo-glass-controls {
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  &__title {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__code {
+    display: block;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(180, 210, 255, 0.8);
+    font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+    font-size: 10px;
+    line-height: 1.4;
+    word-break: break-all;
+  }
+
+  &__presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  &__preset {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 5px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.82);
+    font-family: $font-sans;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+  }
+
+  &__field {
+    display: block;
+
+    & + & {
+      margin-top: 10px;
+    }
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 11px;
+  }
+
+  &__value {
+    color: rgba(180, 210, 255, 0.85);
+    font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+    font-size: 10px;
+  }
+
+  &__slider {
+    &.slider-liquid-glass {
+      display: flex;
+      width: 100%;
+      max-width: none;
+      height: 28px;
+    }
+  }
+
+  &__hint {
+    margin: 12px 0 0;
+    color: rgba(255, 255, 255, 0.38);
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  &.demo-theme-controls {
+    max-width: 360px;
+  }
+}

@@ -5,15 +5,24 @@ import {
   DividerLiquidGlass,
   ListLiquidGlass,
 } from '../components'
+import type { LiquidGlassParams } from '../lib/liquid-glass'
+import { DemoGlassControls } from './DemoGlassControls'
 import { DEMO_NAV } from './demoNav'
 import './DemoSidebar.scss'
 
 interface DemoSidebarProps {
   activeId: string
   onNavigate: (id: string) => void
+  globalGlass: LiquidGlassParams
+  onGlassChange: (params: LiquidGlassParams) => void
 }
 
-export function DemoSidebar({ activeId, onNavigate }: DemoSidebarProps) {
+export function DemoSidebar({
+  activeId,
+  onNavigate,
+  globalGlass,
+  onGlassChange,
+}: DemoSidebarProps) {
   return (
     <CardLiquidGlass
       className="demo-sidebar"
@@ -53,6 +62,18 @@ export function DemoSidebar({ activeId, onNavigate }: DemoSidebarProps) {
           </div>
         ))}
       </nav>
+
+      <DividerLiquidGlass
+        orientation="horizontal"
+        className="demo-sidebar__controls-divider"
+        glassParams={{ borderRadius: 999, strength: 0.5, edgeFalloff: 6 }}
+      />
+
+      <DemoGlassControls
+        className="demo-sidebar__controls"
+        value={globalGlass}
+        onChange={onGlassChange}
+      />
     </CardLiquidGlass>
   )
 }

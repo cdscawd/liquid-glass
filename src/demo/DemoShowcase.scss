@@ -4,6 +4,59 @@
   display: flex;
   min-height: 100svh;
 
+  &--landing {
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__cta {
+    width: 400px;
+    height: 200px;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0;
+    white-space: normal;
+    text-align: center;
+  }
+
+  &__cta-eyebrow {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: rgba(140, 190, 255, 0.82);
+    text-shadow: 0 0 18px rgba(33, 97, 247, 0.55);
+  }
+
+  &__cta-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 36px;
+    gap: 4px;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    text-shadow:
+      0 2px 12px rgba(0, 0, 0, 0.45),
+      0 0 24px rgba(33, 97, 247, 0.28);
+  }
+
+  &__cta-title-line {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.96);
+    margin-bottom: 10px;
+  }
+
+  &__cta-title-highlight {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.96);
+    letter-spacing: 0.06em;
+    text-shadow:
+      0 0 20px rgba(33, 97, 247, 0.65),
+      0 0 40px rgba(33, 97, 247, 0.25);
+  }
+
   &__main {
     flex: 1;
     min-width: 0;

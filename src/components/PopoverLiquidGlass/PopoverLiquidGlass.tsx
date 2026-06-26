@@ -13,6 +13,7 @@ import {
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
+import { useAnchorFollowPosition } from '../../lib/useAnchorFollowPosition'
 import './PopoverLiquidGlass.scss'
 
 export interface PopoverLiquidGlassProps
@@ -43,7 +44,16 @@ export function PopoverLiquidGlass({
   const open = isControlled ? openProp : uncontrolled
 
   const anchorRef = useRef<HTMLSpanElement>(null)
-  const [position, setPosition] = useState({ top: 0, left: 0 })
+
+  const measurePosition = useCallback(
+    (rect: DOMRect) => ({
+      top: rect.bottom + 8,
+      left: rect.left + rect.width / 2,
+    }),
+    [],
+  )
+
+  const position = useAnchorFollowPosition(anchorRef, open, measurePosition)
 
   const setOpen = useCallback(
     (next: boolean) => {
@@ -55,15 +65,6 @@ export function PopoverLiquidGlass({
 
   const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'popover-liquid-glass', variant })
-
-  useEffect(() => {
-    if (!open || !anchorRef.current) return
-    const rect = anchorRef.current.getBoundingClientRect()
-    setPosition({
-      top: rect.bottom + 8,
-      left: rect.left + rect.width / 2,
-    })
-  }, [open])
 
   useEffect(() => {
     if (!open) return

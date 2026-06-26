@@ -24,6 +24,16 @@ const TRACK_SIZE = {
   lg: { width: 60, height: 36 },
 } as const
 
+const TRACK_BORDER = 2
+
+function getInnerTrackSize(size: SwitchLiquidGlassSize) {
+  const outer = TRACK_SIZE[size]
+  return {
+    width: outer.width - TRACK_BORDER,
+    height: outer.height - TRACK_BORDER,
+  }
+}
+
 export type SwitchLiquidGlassSize = 'sm' | 'md' | 'lg'
 
 export interface SwitchLiquidGlassProps
@@ -70,9 +80,7 @@ export function SwitchLiquidGlass({
     lastClientX: number
   } | null>(null)
 
-  const [trackSize, setTrackSize] = useState<{ width: number; height: number }>(
-    TRACK_SIZE[size],
-  )
+  const [trackSize, setTrackSize] = useState(getInnerTrackSize(size))
   const [isDragging, setIsDragging] = useState(false)
   const [dragSessionId, setDragSessionId] = useState(0)
   const [dragThumbLeft, setDragThumbLeft] = useState<number | null>(null)
@@ -99,7 +107,8 @@ export function SwitchLiquidGlass({
     const el = trackRef.current
     if (!el) return
     const measure = () => {
-      const { width, height } = el.getBoundingClientRect()
+      const width = el.clientWidth
+      const height = el.clientHeight
       if (width > 0 && height > 0) {
         setTrackSize({ width, height })
       }

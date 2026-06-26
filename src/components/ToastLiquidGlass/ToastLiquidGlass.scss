@@ -13,11 +13,17 @@
   padding: 14px 16px;
 
   &--success {
-    border-color: $glass-border-success;
+    @include glass-variant-from-color($glass-variant-success);
   }
 
   &--error {
-    border-color: $glass-border-error;
+    @include glass-variant-from-color($glass-variant-danger);
+  }
+
+  &--success &__desc,
+  &--error &__desc {
+    color: inherit;
+    opacity: 0.85;
   }
 
   &__title {

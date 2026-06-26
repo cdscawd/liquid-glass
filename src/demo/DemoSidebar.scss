@@ -7,7 +7,7 @@
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    width: 220px;
+    width: 200px;
     height: 100svh;
     min-width: 0;
     padding: 16px 12px 20px;
@@ -84,6 +84,21 @@
       font-size: 13px;
       font-weight: 500;
     }
+  }
+
+  &__controls-divider {
+    &.divider-liquid-glass--horizontal {
+      flex-shrink: 0;
+      width: 100%;
+      max-width: none;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+  }
+
+  &__controls {
+    flex-shrink: 0;
+    padding: 0 2px 4px;
   }
 }
 
