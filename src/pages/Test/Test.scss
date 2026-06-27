@@ -2,10 +2,10 @@
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background-image: url('../../assets/7761503d-8887-4e13-abf9-73ff55f5126f.png');
-  background-size: contain;
+  background-image: url('../../assets/Simulator Screenshot - iPhone 17 Pro Max - 2026-06-28 at 01.35.24.png');
+  background-size: auto 100%;
   background-position: center;
-  background-repeat: repeat;
+  background-repeat: no-repeat;
   padding: 24px;
 }
 
@@ -29,6 +29,15 @@
   &--dragging {
     cursor: grabbing;
   }
+}
+
+.test-page__glass {
+  // background: rgba(255, 255, 255, 0.1);
+  // border-color: rgba(255, 255, 255, 0.42);
+  // box-shadow:
+  //   rgba(0, 0, 0, 0.22) 0 8px 24px,
+  //   rgba(255, 255, 255, 0.08) 0 1px 0 inset,
+  //   inset 0 0 64px rgba(255, 255, 255, 0.06);
 }
 
 .test-page__section {

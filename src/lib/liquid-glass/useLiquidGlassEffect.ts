@@ -23,7 +23,7 @@ import {
 } from './LiquidGlassProvider'
 import { generateDisplacementMap } from './generateDisplacementMap'
 import { resolveEffectiveFilterMode } from './resolveEffectiveFilterMode'
-import { resolveGlassParams } from './resolveGlassParams'
+import { resolveGlassParams, glassParamsMapKey } from './resolveGlassParams'
 import type {
   LiquidGlassFilterMode,
   LiquidGlassNestedPolicy,
@@ -120,14 +120,12 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
   const debounceMeasureRef = useRef<number | null>(null)
   const lastMapKeyRef = useRef('')
 
-  const { borderRadius, edgeFalloff, strength } = resolvedParams
-
   const updateMap = useCallback(
     (width: number, height: number) => {
       if (!isFilterActive) return
       if (width < 2 || height < 2) return
 
-      const mapKey = `${width}x${height}:${borderRadius}:${edgeFalloff ?? ''}:${strength ?? ''}`
+      const mapKey = glassParamsMapKey(width, height, resolvedParams)
       if (lastMapKeyRef.current === mapKey) return
 
       lastMapKeyRef.current = mapKey
@@ -143,14 +141,12 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
           generateDisplacementMap({
             width,
             height,
-            borderRadius,
-            edgeFalloff,
-            strength,
+            ...resolvedParams,
           }),
         )
       })
     },
-    [borderRadius, edgeFalloff, isFilterActive, strength],
+    [isFilterActive, resolvedParams],
   )
 
   useEffect(() => {
@@ -226,7 +222,7 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
     mapUrl,
     filterSize,
     filterStyle,
-    borderRadius: borderRadius ?? 8,
+    borderRadius: resolvedParams.borderRadius ?? 8,
     resolvedParams,
     variant: resolvedVariant,
     variantClass,

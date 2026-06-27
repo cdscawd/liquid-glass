@@ -1,12 +1,10 @@
 import { useCallback, useRef, useState, type PointerEvent } from "react";
 import "./Test.scss";
-import { CardLiquidGlass } from "../../components/CardLiquidGlass";
-import { ButtonGroupLiquidGlass } from "../../components/ButtonGroupLiquidGlass";
-import { CyberspaceBackground } from "../../components/CyberspaceBackground";
 import { ButtonLiquidGlass } from "../../components/ButtonLiquidGlass";
-
+import { CyberspaceBackground } from "../../components/CyberspaceBackground";
+import { CardLiquidGlass } from "../../components/CardLiquidGlass";
 export function Test() {
-  const [position, setPosition] = useState({ x: 120, y: 200 });
+  const [position, setPosition] = useState({ x: 48, y: 168 });
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<{
     pointerId: number;
@@ -60,7 +58,7 @@ export function Test() {
   return (
     <div className="test-page">
       <CyberspaceBackground />
-      <div className="test-page__toolbar">
+      {/* <div className="test-page__toolbar">
         <ButtonGroupLiquidGlass
           variant="slider"
           defaultValue="yes"
@@ -73,7 +71,7 @@ export function Test() {
             No
           </ButtonGroupLiquidGlass.Item>
         </ButtonGroupLiquidGlass>
-      </div>
+      </div> */}
 
       <div
         className={`test-page__draggable${isDragging ? " test-page__draggable--dragging" : ""}`}
@@ -89,12 +87,17 @@ export function Test() {
           setIsDragging(false);
         }}
       >
-        <ButtonLiquidGlass
-          style={{ width: "200px", height: "200px" }}
-          glassParams={{ borderRadius: 100, edgeFalloff: 60, strength: 1.1 }}
+        <CardLiquidGlass
+          className="test-page__glass"
+          style={{ width: "200px", height: "200px", borderRadius: 60 }}
+          glassParams={{
+            borderRadius: 40,
+            edgeFalloff: 20,
+            strength: -0.8,
+          }}
         >
           Liquid Glass
-        </ButtonLiquidGlass>
+        </CardLiquidGlass>
       </div>
     </div>
   );

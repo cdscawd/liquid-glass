@@ -48,6 +48,7 @@ export type {
 } from './useLiquidGlassEffect'
 export type { LiquidGlassVariant } from './variant'
 export type {
+  LiquidGlassDeformEdge,
   LiquidGlassFilterMode,
   LiquidGlassHostProps,
   LiquidGlassMapInput,
