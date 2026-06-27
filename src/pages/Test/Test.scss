@@ -1,0 +1,37 @@
+.test-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background-image: url('../../assets/7761503d-8887-4e13-abf9-73ff55f5126f.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: repeat;
+  padding: 24px;
+}
+
+.test-page__toolbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+}
+
+.test-page__draggable {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+
+  &--dragging {
+    cursor: grabbing;
+  }
+}
+
+.test-page__section {
+  display: flex;
+  justify-content: center;
+}

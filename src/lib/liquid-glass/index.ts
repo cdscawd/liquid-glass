@@ -23,11 +23,23 @@ export {
   resolveLiquidGlassVariant,
 } from './variant'
 export {
+  LiquidGlassHostBoundary,
+  LiquidGlassFilterDepthProvider,
+  LiquidGlassStackLayerProvider,
+} from './LiquidGlassFilterContext'
+export {
   LiquidGlassProvider,
   useLiquidGlassDefaults,
+  useLiquidGlassNestedPolicyDefault,
   useLiquidGlassVariantDefault,
   type LiquidGlassProviderProps,
 } from './LiquidGlassProvider'
+export { LiquidGlassStack } from './LiquidGlassStack'
+export type {
+  LiquidGlassStackLayerProps,
+  LiquidGlassStackProps,
+} from './LiquidGlassStack'
+export { resolveEffectiveFilterMode, DEFAULT_NESTED_POLICY } from './resolveEffectiveFilterMode'
 export { resolveGlassParams } from './resolveGlassParams'
 export { useLiquidGlassEffect } from './useLiquidGlassEffect'
 export type {
@@ -35,4 +47,10 @@ export type {
   UseLiquidGlassEffectResult,
 } from './useLiquidGlassEffect'
 export type { LiquidGlassVariant } from './variant'
-export type { LiquidGlassMapInput, LiquidGlassParams } from './types'
+export type {
+  LiquidGlassFilterMode,
+  LiquidGlassHostProps,
+  LiquidGlassMapInput,
+  LiquidGlassNestedPolicy,
+  LiquidGlassParams,
+} from './types'

@@ -2,6 +2,8 @@ import { useState, type HTMLAttributes, type ReactNode } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -17,6 +19,8 @@ export interface CollapseLiquidGlassItem {
 export interface CollapseLiquidGlassProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   items: CollapseLiquidGlassItem[]
   accordion?: boolean
@@ -27,6 +31,8 @@ export interface CollapseLiquidGlassProps
 
 export function CollapseLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   items,
   accordion = false,
@@ -41,7 +47,10 @@ export function CollapseLiquidGlass({
   const isControlled = activeKeysProp !== undefined
   const activeKeys = isControlled ? activeKeysProp : uncontrolled
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'collapse-liquid-glass', variant })
 
   const toggle = (key: string) => {
@@ -58,13 +67,15 @@ export function CollapseLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         className={`collapse-liquid-glass${variantClass}${className ? ` ${className}` : ''}`}

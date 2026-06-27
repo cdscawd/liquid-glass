@@ -3,6 +3,8 @@ import {
   LiquidGlassFilter,
   isPillBorderRadius,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -12,6 +14,8 @@ export type CardLiquidGlassSize = 'sm' | 'md' | 'lg'
 
 export interface CardLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   size?: CardLiquidGlassSize
   children: ReactNode
@@ -26,6 +30,8 @@ function CardLiquidGlassSection({
 
 export function CardLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   size = 'md',
   className = '',
@@ -33,7 +39,11 @@ export function CardLiquidGlass({
   children,
   ...props
 }: CardLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, {
       baseClass: 'card-liquid-glass',
       variant,
@@ -68,20 +78,22 @@ export function CardLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         className={`card-liquid-glass${sizeClass}${pillClass}${variantClass}${className ? ` ${className}` : ''}`}
         style={{ ...filterStyle, borderRadius, ...style }}
         {...props}
       >
-        {children}
+        <HostBoundary>{children}</HostBoundary>
       </div>
     </>
   )

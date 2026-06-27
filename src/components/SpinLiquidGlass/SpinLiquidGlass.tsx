@@ -3,6 +3,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -10,6 +12,8 @@ import './SpinLiquidGlass.scss'
 
 export interface SpinLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   spinning?: boolean
   tip?: string
@@ -18,6 +22,8 @@ export interface SpinLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
 
 export function SpinLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   spinning = true,
   tip,
@@ -27,7 +33,11 @@ export function SpinLiquidGlass({
   children,
   ...props
 }: SpinLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, {
       preset: { borderRadius: GLASS_SHAPE.pill },
       baseClass: 'spin-liquid-glass',
@@ -40,18 +50,20 @@ export function SpinLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         className={`spin-wrap-liquid-glass${className ? ` ${className}` : ''}`}
         style={style}
       >
-        {children}
+        <HostBoundary>{children}</HostBoundary>
         {spinning && (
           <div
             ref={hostRef}

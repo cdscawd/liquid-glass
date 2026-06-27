@@ -3,6 +3,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -13,6 +15,8 @@ export type CheckboxLiquidGlassSize = 'sm' | 'md' | 'lg'
 export interface CheckboxLiquidGlassProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   size?: CheckboxLiquidGlassSize
   checked?: boolean
@@ -23,6 +27,8 @@ export interface CheckboxLiquidGlassProps
 
 export function CheckboxLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   size = 'md',
   checked: checkedProp,
@@ -40,7 +46,10 @@ export function CheckboxLiquidGlass({
   const isControlled = checkedProp !== undefined
   const checked = isControlled ? checkedProp : uncontrolled
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLLabelElement>(glassParams, {
       preset: { borderRadius: GLASS_SHAPE.badge },
       baseClass: 'checkbox-liquid-glass',
@@ -51,13 +60,15 @@ export function CheckboxLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <label
         ref={hostRef}
         className={`checkbox-liquid-glass${sizeClass}${variantClass}${checked ? ' checkbox-liquid-glass--checked' : ''}${disabled ? ' checkbox-liquid-glass--disabled' : ''}${className ? ` ${className}` : ''}`}

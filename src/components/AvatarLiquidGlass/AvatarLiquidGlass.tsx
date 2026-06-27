@@ -3,6 +3,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -12,6 +14,8 @@ export type AvatarLiquidGlassSize = 'sm' | 'md' | 'lg'
 
 export interface AvatarLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   size?: AvatarLiquidGlassSize
   src?: string
@@ -21,6 +25,8 @@ export interface AvatarLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
 
 export function AvatarLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   size = 'md',
   src,
@@ -31,7 +37,10 @@ export function AvatarLiquidGlass({
   children,
   ...props
 }: AvatarLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, {
       preset: { borderRadius: GLASS_SHAPE.pill },
       baseClass: 'avatar-liquid-glass',
@@ -42,13 +51,15 @@ export function AvatarLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         className={`avatar-liquid-glass${sizeClass}${variantClass}${className ? ` ${className}` : ''}`}

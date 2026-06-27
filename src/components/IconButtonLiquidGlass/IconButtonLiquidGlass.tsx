@@ -3,6 +3,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -13,6 +15,8 @@ export type IconButtonLiquidGlassSize = 'sm' | 'md' | 'lg'
 export interface IconButtonLiquidGlassProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   size?: IconButtonLiquidGlassSize
   'aria-label': string
@@ -21,6 +25,8 @@ export interface IconButtonLiquidGlassProps
 
 export function IconButtonLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   size = 'md',
   className = '',
@@ -28,7 +34,11 @@ export function IconButtonLiquidGlass({
   children,
   ...props
 }: IconButtonLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLButtonElement>(glassParams, {
       preset: { borderRadius: GLASS_SHAPE.pill },
       baseClass: 'icon-button-liquid-glass',
@@ -39,13 +49,15 @@ export function IconButtonLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <button
         ref={hostRef}
         type="button"
@@ -53,7 +65,7 @@ export function IconButtonLiquidGlass({
         style={{ ...filterStyle, borderRadius, ...style }}
         {...props}
       >
-        {children}
+        <HostBoundary>{children}</HostBoundary>
       </button>
     </>
   )

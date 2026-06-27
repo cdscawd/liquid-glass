@@ -60,10 +60,21 @@ Copy and track progress:
 
 **Hard rules**
 
-- 1 glass host = 1 `useLiquidGlassEffect` = 1 `LiquidGlassFilter`
-- Never nest backdrop-filter (parent filter + child filter)
+- 1 glass host = 1 `useLiquidGlassEffect` = 1 `LiquidGlassFilter`（`isFilterActive` 为 false 时跳过）
+- 多层折射：用 `LiquidGlassStack` 兄弟层，或 Portal 浮层；裸嵌套靠 `filterMode`/`nestedPolicy` 配置
 - Lists/tables: single container filter, not per-row
 - Measure inner size with `clientWidth` / `clientHeight` when positioning children inside bordered hosts
+
+**Nested glass stack**
+
+```tsx
+import { LiquidGlassStack } from '../../lib/liquid-glass'
+
+<LiquidGlassStack>
+  <LiquidGlassStack.Layer><CardLiquidGlass>...</CardLiquidGlass></LiquidGlassStack.Layer>
+  <LiquidGlassStack.Layer overlay><ButtonLiquidGlass>...</ButtonLiquidGlass></LiquidGlassStack.Layer>
+</LiquidGlassStack>
+```
 
 ### Step 2 — Naming
 
@@ -85,6 +96,8 @@ Every glass host exposes:
 ```tsx
 interface XxxLiquidGlassProps extends /* native HTML attrs */ {
   glassParams?: LiquidGlassParams  // borderRadius | edgeFalloff | strength
+  filterMode?: LiquidGlassFilterMode  // 'auto' | 'filter' | 'surface'
+  nestedPolicy?: LiquidGlassNestedPolicy  // 'overlay' | 'surface' | 'filter'
   variant?: LiquidGlassVariant     // when semantic colors needed
   className?: string
   style?: CSSProperties
@@ -184,7 +197,7 @@ Same UX as existing component?
 - Copying displacement map / filter logic into components
 - CSS `filter: blur()` as fake liquid glass
 - Hardcoded `rgba(255,255,255,0.06)`, `999`, `1.15`
-- Parent + child both with backdrop-filter
+- Bare DOM nesting of multiple glass filters without `LiquidGlassStack` or explicit `filterMode`/`nestedPolicy`
 - Per-row glass filters in lists
 - Git commit unless user asks
 

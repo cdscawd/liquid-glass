@@ -3,6 +3,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -10,6 +12,8 @@ import './RateLiquidGlass.scss'
 
 export interface RateLiquidGlassProps {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   count?: number
   value?: number
@@ -23,6 +27,8 @@ export interface RateLiquidGlassProps {
 
 export function RateLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   count = 5,
   value: valueProp,
@@ -38,11 +44,16 @@ export function RateLiquidGlass({
   const value = isControlled ? valueProp : uncontrolled
   const [hover, setHover] = useState<number | null>(null)
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, {
       preset: { borderRadius: GLASS_SHAPE.pill },
       baseClass: 'rate-liquid-glass',
       variant,
+      filterMode,
+      nestedPolicy,
     })
 
   const display = hover ?? value
@@ -55,13 +66,15 @@ export function RateLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         role="slider"

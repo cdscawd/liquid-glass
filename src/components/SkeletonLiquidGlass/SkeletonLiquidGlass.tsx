@@ -2,6 +2,8 @@ import { type HTMLAttributes } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -10,6 +12,8 @@ import './SkeletonLiquidGlass.scss'
 export interface SkeletonLiquidGlassProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   active?: boolean
   avatar?: boolean
@@ -19,6 +23,8 @@ export interface SkeletonLiquidGlassProps
 
 export function SkeletonLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   active = true,
   avatar = false,
@@ -28,7 +34,10 @@ export function SkeletonLiquidGlass({
   style,
   ...props
 }: SkeletonLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'skeleton-liquid-glass', variant })
 
   const rows =
@@ -36,13 +45,15 @@ export function SkeletonLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         className={`skeleton-liquid-glass${variantClass}${active ? ' skeleton-liquid-glass--active' : ''}${className ? ` ${className}` : ''}`}

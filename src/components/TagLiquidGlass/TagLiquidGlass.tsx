@@ -3,6 +3,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -13,6 +15,8 @@ export type TagLiquidGlassColor = 'default' | 'success' | 'warning' | 'error' | 
 
 export interface TagLiquidGlassProps extends HTMLAttributes<HTMLSpanElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   size?: TagLiquidGlassSize
   /** 语义色，优先于 color */
   variant?: LiquidGlassVariant
@@ -35,6 +39,8 @@ function resolveTagVariant(
 
 export function TagLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   size = 'md',
   variant,
   color = 'default',
@@ -52,7 +58,11 @@ export function TagLiquidGlass({
       ? ` tag-liquid-glass--${color}`
       : ''
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLSpanElement>(glassParams, {
       preset: { borderRadius: GLASS_SHAPE.pill },
       baseClass: 'tag-liquid-glass',
@@ -63,13 +73,15 @@ export function TagLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <span
         ref={hostRef}
         className={`tag-liquid-glass${legacyColorClass}${sizeClass}${variantClass}${className ? ` ${className}` : ''}`}
@@ -77,7 +89,7 @@ export function TagLiquidGlass({
         {...props}
       >
         {icon && <span className="tag-liquid-glass__icon">{icon}</span>}
-        <span className="tag-liquid-glass__text">{children}</span>
+        <span className="tag-liquid-glass__text"><HostBoundary>{children}</HostBoundary></span>
         {closable && (
           <button
             type="button"

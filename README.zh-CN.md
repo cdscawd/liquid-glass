@@ -906,7 +906,7 @@ import { DEFAULT_THUMB_STRENGTH, DEFAULT_FILL_STRENGTH_MULTIPLIER } from './lib/
 
 - **一个宿主 = 一个 SVG 滤镜** — 每个 `useLiquidGlassEffect` 实例独立持有滤镜
 - **列表单容器** — `ListLiquidGlass` 整表一个 filter，禁止每行独立滤镜
-- **避免嵌套 `backdrop-filter`** — Switch thumb 仅用 SCSS
+- **嵌套玻璃可配置** — `filterMode`（`auto` | `filter` | `surface`）与 `nestedPolicy`（`overlay` | `surface` | `filter`）；双层折射推荐 `LiquidGlassStack` 兄弟层叠加
 - 位移贴图在钩子内防抖，通过 `requestIdleCallback` 调度生成
 - `glass-surface` mixin 设置 `contain: layout style paint` + `isolation: isolate`
 

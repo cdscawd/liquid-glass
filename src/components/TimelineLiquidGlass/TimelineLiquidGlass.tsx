@@ -2,6 +2,8 @@ import { type HTMLAttributes, type ReactNode } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -16,6 +18,8 @@ export interface TimelineLiquidGlassItem {
 
 export interface TimelineLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   items: TimelineLiquidGlassItem[]
   mode?: 'left' | 'alternate'
@@ -23,6 +27,8 @@ export interface TimelineLiquidGlassProps extends HTMLAttributes<HTMLDivElement>
 
 export function TimelineLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   items,
   mode = 'left',
@@ -30,20 +36,25 @@ export function TimelineLiquidGlass({
   style,
   ...props
 }: TimelineLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'timeline-liquid-glass', variant })
 
   const modeClass = mode === 'left' ? '' : ' timeline-liquid-glass--alternate'
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         className={`timeline-liquid-glass${variantClass}${modeClass}${className ? ` ${className}` : ''}`}

@@ -2,6 +2,8 @@ import { type HTMLAttributes, type ReactNode } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -9,6 +11,8 @@ import './EmptyLiquidGlass.scss'
 
 export interface EmptyLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   description?: ReactNode
   image?: ReactNode
@@ -16,6 +20,8 @@ export interface EmptyLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
 
 export function EmptyLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   description = '暂无数据',
   image,
@@ -24,18 +30,24 @@ export function EmptyLiquidGlass({
   children,
   ...props
 }: EmptyLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'empty-liquid-glass', variant })
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         className={`empty-liquid-glass${variantClass}${className ? ` ${className}` : ''}`}
@@ -46,7 +58,7 @@ export function EmptyLiquidGlass({
           {image ?? <span className="empty-liquid-glass__icon" aria-hidden>◌</span>}
         </div>
         <div className="empty-liquid-glass__desc">{description}</div>
-        {children && <div className="empty-liquid-glass__footer">{children}</div>}
+        {children && <div className="empty-liquid-glass__footer"><HostBoundary>{children}</HostBoundary></div>}
       </div>
     </>
   )

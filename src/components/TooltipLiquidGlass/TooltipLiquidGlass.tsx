@@ -4,12 +4,16 @@ import { useFloatingPosition } from '../../lib/useFloatingPosition'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
 } from '../../lib/liquid-glass'
 import './TooltipLiquidGlass.scss'
 
 export interface TooltipLiquidGlassProps {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   content: ReactNode
   children: ReactNode
   open?: boolean
@@ -17,6 +21,8 @@ export interface TooltipLiquidGlassProps {
 
 export function TooltipLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   content,
   children,
   open: openProp,
@@ -27,8 +33,12 @@ export function TooltipLiquidGlass({
   const triggerRef = useRef<HTMLSpanElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams)
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius,
+    isFilterActive,
+    HostBoundary,
+  } =
+    useLiquidGlassEffect<HTMLDivElement>(glassParams, { filterMode, nestedPolicy, enabled: open })
 
   const floatingStyle = useFloatingPosition({
     enabled: open,
@@ -49,18 +59,20 @@ export function TooltipLiquidGlass({
         onFocus={() => openProp === undefined && setHoverOpen(true)}
         onBlur={() => openProp === undefined && setHoverOpen(false)}
       >
-        {children}
+        <HostBoundary>{children}</HostBoundary>
       </span>
       {open &&
         createPortal(
           <>
-            <LiquidGlassFilter
+            {isFilterActive && (
+        <LiquidGlassFilter
               filterId={filterId}
               mapId={mapId}
               mapUrl={mapUrl}
               width={filterSize.width}
               height={filterSize.height}
             />
+      )}
             <div
               ref={(node) => {
                 hostRef.current = node
@@ -70,7 +82,7 @@ export function TooltipLiquidGlass({
               className="tooltip-liquid-glass"
               style={{ ...filterStyle, borderRadius, ...floatingStyle }}
             >
-              {content}
+              <HostBoundary>{content}</HostBoundary>
             </div>
           </>,
           document.body,

@@ -18,6 +18,8 @@ import {
   LiquidGlassFilter,
   PILL_BORDER_RADIUS,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
 } from '../../lib/liquid-glass'
 import './ButtonGroupLiquidGlass.scss'
@@ -40,6 +42,8 @@ interface ItemLayout {
 interface ButtonGroupLiquidGlassBaseProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   size?: ButtonGroupLiquidGlassSize
   value?: string
   defaultValue?: string
@@ -98,7 +102,8 @@ function ButtonGroupLiquidGlassItem({
   onClick,
   ...props
 }: ButtonGroupLiquidGlassItemProps) {
-  const { value: selectedValue, name, size, isDragging, ignoreClickRef, select } =
+  const {
+    value: selectedValue, name, size, isDragging, ignoreClickRef, select } =
     useButtonGroupContext('ButtonGroupLiquidGlass.Item')
   const selected = selectedValue === value
   const sizeClass =
@@ -185,6 +190,8 @@ function useGroupValue(
 
 function ButtonGroupLiquidGlassDefault({
   glassParams,
+  filterMode,
+  nestedPolicy,
   size = 'md',
   value: valueProp,
   defaultValue,
@@ -197,20 +204,28 @@ function ButtonGroupLiquidGlassDefault({
 }: ButtonGroupLiquidGlassDefaultProps) {
   const { value, select } = useGroupValue(valueProp, defaultValue, onValueChange)
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams)
+  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius,
+    isFilterActive,
+    HostBoundary,
+  } =
+    useLiquidGlassEffect<HTMLDivElement>(glassParams, {
+      filterMode,
+      nestedPolicy,
+    })
 
   const sizeClass = size === 'md' ? '' : ` button-group-liquid-glass--${size}`
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         role="radiogroup"
@@ -233,7 +248,7 @@ function ButtonGroupLiquidGlassDefault({
             select,
           }}
         >
-          {children}
+          <HostBoundary>{children}</HostBoundary>
         </ButtonGroupContext.Provider>
       </div>
     </>
@@ -242,6 +257,8 @@ function ButtonGroupLiquidGlassDefault({
 
 function ButtonGroupSliderLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   thumbGlassParams,
   size = 'md',
   value: valueProp,
@@ -253,7 +270,8 @@ function ButtonGroupSliderLiquidGlass({
   children,
   ...props
 }: ButtonGroupSliderLiquidGlassProps) {
-  const { value, select: baseSelect } = useGroupValue(
+  const {
+    value, select: baseSelect } = useGroupValue(
     valueProp,
     defaultValue,
     onValueChange,
@@ -296,8 +314,14 @@ function ButtonGroupSliderLiquidGlass({
     [baseSelect],
   )
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams)
+  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius,
+    isFilterActive,
+    HostBoundary,
+  } =
+    useLiquidGlassEffect<HTMLDivElement>(glassParams, {
+      filterMode,
+      nestedPolicy,
+    })
 
   const activeLayout = itemLayouts.find((item) => item.value === value)
   const activeThumb = activeLayout ? getThumbRect(activeLayout) : null
@@ -329,7 +353,12 @@ function ButtonGroupSliderLiquidGlass({
     mapUrl: thumbMapUrl,
     filterSize: thumbFilterSize,
     filterStyle: thumbFilterStyle,
-  } = useLiquidGlassEffect<HTMLDivElement>(resolvedThumbGlassParams)
+    isFilterActive: isThumbFilterActive,
+  } =
+    useLiquidGlassEffect<HTMLDivElement>(resolvedThumbGlassParams, {
+      filterMode,
+      nestedPolicy,
+    })
 
   const measureItems = useCallback(() => {
     const track = trackRef.current
@@ -513,14 +542,16 @@ function ButtonGroupSliderLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
-      {thumbRect && (
+      )}
+      {thumbRect && isThumbFilterActive && (
         <LiquidGlassFilter
           filterId={thumbFilterId}
           mapId={thumbMapId}
@@ -566,7 +597,7 @@ function ButtonGroupSliderLiquidGlass({
           <ButtonGroupContext.Provider
             value={{ value, name, size, isDragging, ignoreClickRef, select }}
           >
-            {children}
+            <HostBoundary>{children}</HostBoundary>
           </ButtonGroupContext.Provider>
         </div>
       </div>

@@ -16,3 +16,15 @@ export interface LiquidGlassParams {
   edgeFalloff?: number
   strength?: number
 }
+
+/** 组件自身 filter 行为 */
+export type LiquidGlassFilterMode = 'filter' | 'surface' | 'auto'
+
+/** 检测到已在 filter 宿主内部时的策略（auto 模式生效） */
+export type LiquidGlassNestedPolicy = 'overlay' | 'surface' | 'filter'
+
+export interface LiquidGlassHostProps {
+  glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
+}

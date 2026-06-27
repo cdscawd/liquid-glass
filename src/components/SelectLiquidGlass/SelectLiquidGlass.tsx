@@ -10,6 +10,8 @@ import { useFloatingPosition } from '../../lib/useFloatingPosition'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -25,6 +27,8 @@ export interface SelectLiquidGlassOption {
 
 export interface SelectLiquidGlassProps {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   dropdownGlassParams?: LiquidGlassParams
   variant?: LiquidGlassVariant
   size?: SelectLiquidGlassSize
@@ -40,6 +44,8 @@ export interface SelectLiquidGlassProps {
 
 export function SelectLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   dropdownGlassParams,
   variant,
   size = 'md',
@@ -61,11 +67,16 @@ export function SelectLiquidGlass({
   const triggerRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLUListElement>(null)
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams, {
-      baseClass: 'select-liquid-glass',
-      variant,
-    })
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } = useLiquidGlassEffect<HTMLDivElement>(glassParams, {
+    baseClass: 'select-liquid-glass',
+    variant,
+    filterMode,
+    nestedPolicy,
+  })
 
   const {
     hostRef: dropdownHostRef,
@@ -76,9 +87,13 @@ export function SelectLiquidGlass({
     filterStyle: dropdownFilterStyle,
     borderRadius: dropdownBorderRadius,
     variantClass: dropdownVariantClass,
+    isFilterActive: isDropdownFilterActive,
   } = useLiquidGlassEffect<HTMLUListElement>(dropdownGlassParams, {
     baseClass: 'select-liquid-glass__dropdown',
     variant,
+    filterMode,
+    nestedPolicy,
+    enabled: open,
   })
 
   const floatingStyle = useFloatingPosition({
@@ -117,13 +132,15 @@ export function SelectLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={(node) => {
           hostRef.current = node
@@ -132,31 +149,35 @@ export function SelectLiquidGlass({
         className={`select-liquid-glass${sizeClass}${variantClass}${className ? ` ${className}` : ''}`}
         style={{ ...filterStyle, borderRadius, ...style }}
       >
-        <button
-          ref={triggerRef}
-          type="button"
-          className="select-liquid-glass__trigger"
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          disabled={disabled}
-          onClick={() => !disabled && setOpen((prev) => !prev)}
-        >
-          <span className="select-liquid-glass__value">
-            {selected?.label ?? placeholder}
-          </span>
-          <span className="select-liquid-glass__arrow" aria-hidden />
-        </button>
+        <HostBoundary>
+          <button
+            ref={triggerRef}
+            type="button"
+            className="select-liquid-glass__trigger"
+            aria-expanded={open}
+            aria-haspopup="listbox"
+            disabled={disabled}
+            onClick={() => !disabled && setOpen((prev) => !prev)}
+          >
+            <span className="select-liquid-glass__value">
+              {selected?.label ?? placeholder}
+            </span>
+            <span className="select-liquid-glass__arrow" aria-hidden />
+          </button>
+        </HostBoundary>
       </div>
       {open &&
         createPortal(
           <>
-            <LiquidGlassFilter
-              filterId={dropdownFilterId}
-              mapId={dropdownMapId}
-              mapUrl={dropdownMapUrl}
-              width={dropdownFilterSize.width}
-              height={dropdownFilterSize.height}
-            />
+            {isDropdownFilterActive && (
+              <LiquidGlassFilter
+                filterId={dropdownFilterId}
+                mapId={dropdownMapId}
+                mapUrl={dropdownMapUrl}
+                width={dropdownFilterSize.width}
+                height={dropdownFilterSize.height}
+              />
+            )}
             <ul
               ref={(node) => {
                 dropdownHostRef.current = node

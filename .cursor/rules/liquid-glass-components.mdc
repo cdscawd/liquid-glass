@@ -271,10 +271,36 @@ extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>
 - `endDragSession` 统一清理 pointer capture
 - 布局数据用 `ref` 同步，避免闭包过期
 
-### 7.2 嵌套 backdrop-filter
+### 7.2 嵌套 backdrop-filter（可配置）
 
-- **禁止** 在有 backdrop-filter 的父元素内再给子元素加第二层 filter（Switch thumb 仅用 SCSS knob 样式）
-- 多 filter 实例应为 **兄弟层** 或 **独立 Portal**（Modal/Toast）
+多层玻璃折射通过 **`filterMode` / `nestedPolicy` + `LiquidGlassStack`** 配置，不再硬性禁止。
+
+| 配置 | 说明 |
+|------|------|
+| `filterMode: 'auto'`（默认） | 顶层启用 filter；嵌套时按 `nestedPolicy` 处理 |
+| `filterMode: 'filter'` | 始终生成 SVG + backdrop-filter |
+| `filterMode: 'surface'` | 仅 SCSS 玻璃外观（如 Switch thumb） |
+| `nestedPolicy: 'overlay'`（Provider 默认） | 在 `LiquidGlassStack.Layer` 内视为顶层；裸 DOM 嵌套 dev warn + 降级 surface |
+| `nestedPolicy: 'surface'` | 嵌套时降级 SCSS |
+| `nestedPolicy: 'filter'` | 嵌套仍强制 filter（实验性） |
+
+**推荐：双层折射用 `LiquidGlassStack` 兄弟层**
+
+```tsx
+<LiquidGlassStack>
+  <LiquidGlassStack.Layer>
+    <CardLiquidGlass>...</CardLiquidGlass>
+  </LiquidGlassStack.Layer>
+  <LiquidGlassStack.Layer overlay>
+    <ButtonLiquidGlass>MD</ButtonLiquidGlass>
+  </LiquidGlassStack.Layer>
+</LiquidGlassStack>
+```
+
+- `LiquidGlassStack` wrapper 无 filter；各 Layer 通过 Context 重置 `activeFilterDepth`
+- `overlay` 层：`position: absolute; inset: 0`（同 Spin 模式）
+- 浮层仍用 **Portal**（Modal/Toast/Popover）
+- 宿主内用 `<HostBoundary>` 包裹子树以传递嵌套深度（`useLiquidGlassEffect` 返回）
 
 ### 7.3 Portal 浮层
 
@@ -316,6 +342,6 @@ extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>
 - 复制 `generateDisplacementMap` / `LiquidGlassFilter` / `BACKDROP_FILTER`
 - 跳过 `useLiquidGlassEffect` 或固定尺寸贴图
 - 硬编码 `999`、`1.15`、`rgba(255,255,255,0.06)` 等魔法数
-- 父级 + 子级双层 backdrop-filter（除非经设计验证）
+- 裸 DOM 嵌套多层 filter 而不使用 `LiquidGlassStack` 或显式 `filterMode`/`nestedPolicy`
 - 列表/表格每行独立 glass filter
 - 未经请求的 git commit

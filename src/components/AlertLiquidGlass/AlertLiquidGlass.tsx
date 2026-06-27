@@ -2,6 +2,8 @@ import { type HTMLAttributes, type ReactNode } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -12,6 +14,8 @@ export type AlertLiquidGlassVariant = LiquidGlassVariant | 'warning'
 export interface AlertLiquidGlassProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   title?: ReactNode
   children?: ReactNode
   variant?: AlertLiquidGlassVariant
@@ -19,6 +23,8 @@ export interface AlertLiquidGlassProps
 
 export function AlertLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   title,
   children,
   variant = 'default',
@@ -29,7 +35,11 @@ export function AlertLiquidGlass({
   const isWarning = variant === 'warning'
   const tone: LiquidGlassVariant | undefined = isWarning ? undefined : variant
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, {
       baseClass: 'alert-liquid-glass',
       variant: tone,
@@ -37,13 +47,15 @@ export function AlertLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         role="alert"
@@ -52,7 +64,7 @@ export function AlertLiquidGlass({
         {...props}
       >
         {title && <div className="alert-liquid-glass__title">{title}</div>}
-        {children && <div className="alert-liquid-glass__body">{children}</div>}
+        {children && <div className="alert-liquid-glass__body"><HostBoundary>{children}</HostBoundary></div>}
       </div>
     </>
   )

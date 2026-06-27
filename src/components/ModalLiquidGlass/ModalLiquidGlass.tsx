@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -11,6 +13,8 @@ import './ModalLiquidGlass.scss'
 export interface ModalLiquidGlassProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   open?: boolean
   title?: ReactNode
@@ -21,6 +25,8 @@ export interface ModalLiquidGlassProps
 
 export function ModalLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   open = false,
   title,
@@ -31,8 +37,18 @@ export function ModalLiquidGlass({
   style,
   ...props
 }: ModalLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'modal-liquid-glass', variant })
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } =
+    useLiquidGlassEffect<HTMLDivElement>(glassParams, {
+      baseClass: 'modal-liquid-glass',
+      variant,
+      filterMode,
+      nestedPolicy,
+      enabled: open,
+    })
 
   useEffect(() => {
     if (!open) return
@@ -53,13 +69,15 @@ export function ModalLiquidGlass({
         aria-label="Close modal"
         onClick={onClose}
       />
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         role="dialog"
@@ -69,7 +87,7 @@ export function ModalLiquidGlass({
         {...props}
       >
         {title && <div className="modal-liquid-glass__title">{title}</div>}
-        <div className="modal-liquid-glass__body">{children}</div>
+        <div className="modal-liquid-glass__body"><HostBoundary>{children}</HostBoundary></div>
         {footer && <div className="modal-liquid-glass__footer">{footer}</div>}
       </div>
     </div>,

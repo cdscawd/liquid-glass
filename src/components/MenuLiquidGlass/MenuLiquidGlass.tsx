@@ -2,6 +2,8 @@ import { type HTMLAttributes, type ReactNode } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -19,6 +21,8 @@ export interface MenuLiquidGlassItem {
 export interface MenuLiquidGlassProps
   extends Omit<HTMLAttributes<HTMLUListElement>, 'onSelect'> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   items: MenuLiquidGlassItem[]
   selectedKeys?: string[]
@@ -28,6 +32,8 @@ export interface MenuLiquidGlassProps
 
 export function MenuLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   items,
   selectedKeys = [],
@@ -37,20 +43,25 @@ export function MenuLiquidGlass({
   style,
   ...props
 }: MenuLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLUListElement>(glassParams, { baseClass: 'menu-liquid-glass', variant })
 
   const modeClass = mode === 'vertical' ? '' : ' menu-liquid-glass--inline'
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <ul
         ref={hostRef}
         role="menu"

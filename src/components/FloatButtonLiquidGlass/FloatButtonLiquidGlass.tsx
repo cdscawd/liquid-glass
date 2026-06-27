@@ -3,6 +3,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -13,6 +15,8 @@ export type FloatButtonLiquidGlassShape = 'circle' | 'square'
 export interface FloatButtonLiquidGlassProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   icon?: ReactNode
   description?: ReactNode
@@ -21,6 +25,8 @@ export interface FloatButtonLiquidGlassProps
 
 export function FloatButtonLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   icon,
   description,
@@ -30,7 +36,10 @@ export function FloatButtonLiquidGlass({
   children,
   ...props
 }: FloatButtonLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLButtonElement>(glassParams, {
       preset: { borderRadius: shape === 'circle' ? GLASS_SHAPE.pill : GLASS_SHAPE.default },
       baseClass: 'float-button-liquid-glass',
@@ -41,13 +50,15 @@ export function FloatButtonLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <button
         ref={hostRef}
         type="button"

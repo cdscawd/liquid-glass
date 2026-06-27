@@ -2,6 +2,8 @@ import { type HTMLAttributes, type ReactNode } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -15,6 +17,8 @@ export interface AnchorLiquidGlassLink {
 
 export interface AnchorLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   links: AnchorLiquidGlassLink[]
   offsetTop?: number
@@ -22,6 +26,8 @@ export interface AnchorLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
 
 export function AnchorLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   links,
   offsetTop = 80,
@@ -29,7 +35,10 @@ export function AnchorLiquidGlass({
   style,
   ...props
 }: AnchorLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'anchor-liquid-glass', variant })
 
   const handleClick = (href: string) => {
@@ -42,13 +51,15 @@ export function AnchorLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <nav
         ref={hostRef}
         className={`anchor-liquid-glass${variantClass}${className ? ` ${className}` : ''}`}

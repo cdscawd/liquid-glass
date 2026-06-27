@@ -4,12 +4,16 @@ import { useFloatingPosition } from '../../lib/useFloatingPosition'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
 } from '../../lib/liquid-glass'
 import './PopoverLiquidGlass.scss'
 
 export interface PopoverLiquidGlassProps {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   trigger: ReactNode
   content: ReactNode
   open?: boolean
@@ -19,6 +23,8 @@ export interface PopoverLiquidGlassProps {
 
 export function PopoverLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   trigger,
   content,
   open: openProp,
@@ -38,8 +44,12 @@ export function PopoverLiquidGlass({
     onOpenChange?.(next)
   }
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams)
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius,
+    isFilterActive,
+    HostBoundary,
+  } =
+    useLiquidGlassEffect<HTMLDivElement>(glassParams, { filterMode, nestedPolicy, enabled: open })
 
   const floatingStyle = useFloatingPosition({
     enabled: open,
@@ -77,13 +87,15 @@ export function PopoverLiquidGlass({
       {open &&
         createPortal(
           <>
-            <LiquidGlassFilter
+            {isFilterActive && (
+        <LiquidGlassFilter
               filterId={filterId}
               mapId={mapId}
               mapUrl={mapUrl}
               width={filterSize.width}
               height={filterSize.height}
             />
+      )}
             <div
               ref={(node) => {
                 hostRef.current = node
@@ -92,7 +104,7 @@ export function PopoverLiquidGlass({
               className="popover-liquid-glass"
               style={{ ...filterStyle, borderRadius, ...floatingStyle }}
             >
-              {content}
+              <HostBoundary>{content}</HostBoundary>
             </div>
           </>,
           document.body,

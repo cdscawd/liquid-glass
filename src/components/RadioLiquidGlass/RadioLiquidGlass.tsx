@@ -10,6 +10,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
 } from '../../lib/liquid-glass'
 import './RadioLiquidGlass.scss'
@@ -33,6 +35,8 @@ function useRadioGroup(name: string) {
 
 export interface RadioLiquidGlassGroupProps {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   size?: RadioLiquidGlassSize
   name?: string
   value?: string
@@ -45,6 +49,8 @@ export interface RadioLiquidGlassGroupProps {
 
 export function RadioLiquidGlassGroup({
   glassParams,
+  filterMode,
+  nestedPolicy,
   size = 'md',
   name,
   value: valueProp,
@@ -66,22 +72,30 @@ export function RadioLiquidGlassGroup({
     [isControlled, onValueChange],
   )
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, {
       preset: { borderRadius: GLASS_SHAPE.pill },
+      filterMode,
+      nestedPolicy,
     })
 
   const sizeClass = size === 'md' ? '' : ` radio-group-liquid-glass--${size}`
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         role="radiogroup"
@@ -90,7 +104,7 @@ export function RadioLiquidGlassGroup({
         style={{ ...filterStyle, borderRadius, ...style }}
       >
         <RadioGroupContext.Provider value={{ value, name, size, select }}>
-          {children}
+          <HostBoundary>{children}</HostBoundary>
         </RadioGroupContext.Provider>
       </div>
     </>

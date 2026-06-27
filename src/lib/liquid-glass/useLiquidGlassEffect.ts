@@ -1,4 +1,5 @@
 import {
+  createElement,
   useCallback,
   useEffect,
   useId,
@@ -6,13 +7,28 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type FC,
+  type ReactNode,
   type RefObject,
 } from 'react'
 import { BACKDROP_FILTER } from './constants'
-import { useLiquidGlassDefaults, useLiquidGlassVariantDefault } from './LiquidGlassProvider'
+import {
+  LiquidGlassHostBoundary,
+  useLiquidGlassFilterContext,
+} from './LiquidGlassFilterContext'
+import {
+  useLiquidGlassDefaults,
+  useLiquidGlassNestedPolicyDefault,
+  useLiquidGlassVariantDefault,
+} from './LiquidGlassProvider'
 import { generateDisplacementMap } from './generateDisplacementMap'
+import { resolveEffectiveFilterMode } from './resolveEffectiveFilterMode'
 import { resolveGlassParams } from './resolveGlassParams'
-import type { LiquidGlassParams } from './types'
+import type {
+  LiquidGlassFilterMode,
+  LiquidGlassNestedPolicy,
+  LiquidGlassParams,
+} from './types'
 import {
   liquidGlassVariantClass,
   resolveLiquidGlassVariant,
@@ -24,6 +40,10 @@ export interface UseLiquidGlassEffectOptions {
   /** 组件根 class，用于生成 --primary 等 modifier */
   baseClass?: string
   variant?: LiquidGlassVariant
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
+  /** 宿主未挂载时为 false（如 Portal 面板关闭），恢复测量 */
+  enabled?: boolean
 }
 
 export interface UseLiquidGlassEffectResult<T extends HTMLElement> {
@@ -37,6 +57,9 @@ export interface UseLiquidGlassEffectResult<T extends HTMLElement> {
   resolvedParams: LiquidGlassParams
   variant: LiquidGlassVariant
   variantClass: string
+  effectiveFilterMode: 'filter' | 'surface'
+  isFilterActive: boolean
+  HostBoundary: FC<{ children: ReactNode }>
 }
 
 function scheduleIdle(callback: () => void, timeout = 120): number {
@@ -60,6 +83,9 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
 ): UseLiquidGlassEffectResult<T> {
   const contextParams = useLiquidGlassDefaults()
   const contextVariant = useLiquidGlassVariantDefault()
+  const contextNestedPolicy = useLiquidGlassNestedPolicyDefault()
+  const { activeFilterDepth, isStackLayer } = useLiquidGlassFilterContext()
+
   const resolvedVariant = resolveLiquidGlassVariant(options?.variant, contextVariant)
   const variantClass = options?.baseClass
     ? liquidGlassVariantClass(options.baseClass, resolvedVariant)
@@ -69,6 +95,17 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
     contextParams,
     options?.preset,
   )
+
+  const nestedPolicy = options?.nestedPolicy ?? contextNestedPolicy
+  const effectiveFilterMode = resolveEffectiveFilterMode(
+    options?.filterMode,
+    nestedPolicy,
+    activeFilterDepth,
+    isStackLayer,
+  )
+  const isFilterActive = effectiveFilterMode === 'filter'
+  const isEnabled = options?.enabled !== false
+  const shouldMeasure = isFilterActive && isEnabled
 
   const reactId = useId().replace(/:/g, '')
   const filterId = `liquid-glass-${reactId}`
@@ -87,6 +124,7 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
 
   const updateMap = useCallback(
     (width: number, height: number) => {
+      if (!isFilterActive) return
       if (width < 2 || height < 2) return
 
       const mapKey = `${width}x${height}:${borderRadius}:${edgeFalloff ?? ''}:${strength ?? ''}`
@@ -112,10 +150,12 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
         )
       })
     },
-    [borderRadius, edgeFalloff, strength],
+    [borderRadius, edgeFalloff, isFilterActive, strength],
   )
 
   useEffect(() => {
+    if (!shouldMeasure) return
+
     const el = hostRef.current
     if (!el) return
 
@@ -157,14 +197,27 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
         window.clearTimeout(debounceMeasureRef.current)
       }
     }
-  }, [updateMap])
+  }, [shouldMeasure, updateMap])
 
   const filterStyle = useMemo((): CSSProperties => {
+    if (!isFilterActive) return {}
+
     return {
       backdropFilter: `url(#${filterId}) ${BACKDROP_FILTER}`,
       WebkitBackdropFilter: `url(#${filterId}) ${BACKDROP_FILTER}`,
     }
-  }, [filterId])
+  }, [filterId, isFilterActive])
+
+  const HostBoundary = useMemo(
+    (): FC<{ children: ReactNode }> =>
+      function LiquidGlassHostBoundaryWrapper({ children }) {
+        return createElement(LiquidGlassHostBoundary, {
+          enabled: isFilterActive,
+          children,
+        })
+      },
+    [isFilterActive],
+  )
 
   return {
     hostRef,
@@ -177,5 +230,8 @@ export function useLiquidGlassEffect<T extends HTMLElement>(
     resolvedParams,
     variant: resolvedVariant,
     variantClass,
+    effectiveFilterMode,
+    isFilterActive,
+    HostBoundary,
   }
 }

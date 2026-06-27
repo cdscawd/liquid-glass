@@ -825,7 +825,7 @@ New glass hosts **must** use `useLiquidGlassEffect` — do not copy `generateDis
 
 - **One host = one SVG filter** — each `useLiquidGlassEffect` instance owns a filter
 - **Lists use a single container** — `ListLiquidGlass` applies one filter, not per row
-- **Avoid nested `backdrop-filter`** — Switch thumb uses SCSS only
+- **Nested glass is configurable** — `filterMode` (`auto` | `filter` | `surface`) and `nestedPolicy` (`overlay` | `surface` | `filter`); use `LiquidGlassStack` sibling layers for double refraction
 - Displacement maps are debounced and scheduled via `requestIdleCallback`
 - `glass-surface` mixin sets `contain: layout style paint` + `isolation: isolate`
 

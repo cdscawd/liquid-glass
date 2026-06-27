@@ -5,12 +5,16 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
 } from '../../lib/liquid-glass'
 import './ProgressLiquidGlass.scss'
 
 export interface ProgressLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   fillGlassParams?: LiquidGlassParams
   value?: number
   max?: number
@@ -18,6 +22,8 @@ export interface ProgressLiquidGlassProps extends HTMLAttributes<HTMLDivElement>
 
 export function ProgressLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   fillGlassParams,
   value = 0,
   max = 100,
@@ -27,10 +33,21 @@ export function ProgressLiquidGlass({
 }: ProgressLiquidGlassProps) {
   const percent = max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams, {
-      preset: { borderRadius: GLASS_SHAPE.pill },
-    })
+  const {
+    hostRef,
+    filterId,
+    mapId,
+    mapUrl,
+    filterSize,
+    filterStyle,
+    borderRadius,
+    isFilterActive,
+    HostBoundary,
+  } = useLiquidGlassEffect<HTMLDivElement>(glassParams, {
+    preset: { borderRadius: GLASS_SHAPE.pill },
+    filterMode,
+    nestedPolicy,
+  })
 
   const {
     hostRef: fillRef,
@@ -39,29 +56,36 @@ export function ProgressLiquidGlass({
     mapUrl: fillMapUrl,
     filterSize: fillFilterSize,
     filterStyle: fillFilterStyle,
+    isFilterActive: isFillFilterActive,
   } = useLiquidGlassEffect<HTMLDivElement>(fillGlassParams, {
     preset: {
       borderRadius: GLASS_SHAPE.pill,
       strength: DEFAULT_THUMB_STRENGTH * DEFAULT_FILL_STRENGTH_MULTIPLIER,
     },
+    filterMode,
+    nestedPolicy,
   })
 
   return (
     <>
-      <LiquidGlassFilter
-        filterId={filterId}
-        mapId={mapId}
-        mapUrl={mapUrl}
-        width={filterSize.width}
-        height={filterSize.height}
-      />
-      <LiquidGlassFilter
-        filterId={fillFilterId}
-        mapId={fillMapId}
-        mapUrl={fillMapUrl}
-        width={fillFilterSize.width}
-        height={fillFilterSize.height}
-      />
+      {isFilterActive && (
+        <LiquidGlassFilter
+          filterId={filterId}
+          mapId={mapId}
+          mapUrl={mapUrl}
+          width={filterSize.width}
+          height={filterSize.height}
+        />
+      )}
+      {isFillFilterActive && (
+        <LiquidGlassFilter
+          filterId={fillFilterId}
+          mapId={fillMapId}
+          mapUrl={fillMapUrl}
+          width={fillFilterSize.width}
+          height={fillFilterSize.height}
+        />
+      )}
       <div
         ref={hostRef}
         role="progressbar"
@@ -72,15 +96,17 @@ export function ProgressLiquidGlass({
         style={{ ...filterStyle, borderRadius, ...style }}
         {...props}
       >
-        <div
-          ref={fillRef}
-          className="progress-liquid-glass__fill"
-          style={{
-            ...fillFilterStyle,
-            width: `${percent}%`,
-            borderRadius,
-          }}
-        />
+        <HostBoundary>
+          <div
+            ref={fillRef}
+            className="progress-liquid-glass__fill"
+            style={{
+              ...fillFilterStyle,
+              width: `${percent}%`,
+              borderRadius,
+            }}
+          />
+        </HostBoundary>
       </div>
     </>
   )

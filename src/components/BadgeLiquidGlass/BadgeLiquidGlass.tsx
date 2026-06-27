@@ -3,6 +3,8 @@ import {
   GLASS_SHAPE,
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -15,6 +17,8 @@ export type BadgeLiquidGlassShape = 'badge' | 'chip'
 
 export interface BadgeLiquidGlassProps extends HTMLAttributes<HTMLSpanElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   size?: BadgeLiquidGlassSize
   /** 外形：badge 圆角矩形 / chip 胶囊 */
   shape?: BadgeLiquidGlassShape
@@ -26,6 +30,8 @@ export interface BadgeLiquidGlassProps extends HTMLAttributes<HTMLSpanElement> {
 
 export function BadgeLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   size = 'md',
   shape: shapeProp,
   variant: legacyShape,
@@ -37,7 +43,11 @@ export function BadgeLiquidGlass({
 }: BadgeLiquidGlassProps) {
   const shape = shapeProp ?? legacyShape ?? 'badge'
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLSpanElement>(glassParams, {
       preset: {
         borderRadius: shape === 'chip' ? GLASS_SHAPE.pill : GLASS_SHAPE.badge,
@@ -51,20 +61,22 @@ export function BadgeLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <span
         ref={hostRef}
         className={`badge-liquid-glass${shapeClass}${sizeClass}${variantClass}${className ? ` ${className}` : ''}`}
         style={{ ...filterStyle, borderRadius, ...style }}
         {...props}
       >
-        {children}
+        <HostBoundary>{children}</HostBoundary>
       </span>
     </>
   )

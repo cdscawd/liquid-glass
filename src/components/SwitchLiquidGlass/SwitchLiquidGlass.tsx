@@ -11,6 +11,8 @@ import {
   LiquidGlassFilter,
   PILL_BORDER_RADIUS,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
 } from '../../lib/liquid-glass'
 import './SwitchLiquidGlass.scss'
@@ -39,6 +41,8 @@ export type SwitchLiquidGlassSize = 'sm' | 'md' | 'lg'
 export interface SwitchLiquidGlassProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange' | 'value'> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   thumbGlassParams?: LiquidGlassParams
   size?: SwitchLiquidGlassSize
   checked?: boolean
@@ -55,6 +59,8 @@ function getThumbRadius(borderRadius: number, height: number): number {
 
 export function SwitchLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   thumbGlassParams,
   size = 'md',
   checked: checkedProp,
@@ -98,7 +104,11 @@ export function SwitchLiquidGlass({
     setChecked(!checked)
   }, [checked, setChecked])
 
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius,
+    isFilterActive,
+    HostBoundary,
+  } =
     useLiquidGlassEffect<HTMLButtonElement>(glassParams, {
       preset: { borderRadius: GLASS_SHAPE.pill },
     })
@@ -248,13 +258,15 @@ export function SwitchLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <button
         ref={setRefs}
         type="button"
@@ -274,6 +286,7 @@ export function SwitchLiquidGlass({
         }}
         {...props}
       >
+        <HostBoundary>
         <span
           className={`switch-liquid-glass__thumb${isDragging ? ' switch-liquid-glass__thumb--dragging' : ''}`}
           aria-hidden
@@ -285,6 +298,7 @@ export function SwitchLiquidGlass({
               thumbRadius >= PILL_BORDER_RADIUS ? '999px' : `${thumbRadius}px`,
           }}
         />
+        </HostBoundary>
       </button>
     </>
   )

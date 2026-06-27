@@ -2,6 +2,8 @@ import { type HTMLAttributes, type ReactNode } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
   type LiquidGlassVariant,
 } from '../../lib/liquid-glass'
@@ -15,6 +17,8 @@ export interface LiquidGlassStepItem {
 
 export interface StepsLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   variant?: LiquidGlassVariant
   items: LiquidGlassStepItem[]
   current?: number
@@ -23,6 +27,8 @@ export interface StepsLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
 
 export function StepsLiquidGlass({
   glassParams,
+  filterMode,
+  nestedPolicy,
   variant,
   items,
   current = 0,
@@ -31,7 +37,10 @@ export function StepsLiquidGlass({
   style,
   ...props
 }: StepsLiquidGlassProps) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass } =
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius, variantClass,
+    isFilterActive
+  } =
     useLiquidGlassEffect<HTMLDivElement>(glassParams, { baseClass: 'steps-liquid-glass', variant })
 
   const dirClass =
@@ -46,13 +55,15 @@ export function StepsLiquidGlass({
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         className={`steps-liquid-glass${variantClass}${dirClass}${className ? ` ${className}` : ''}`}

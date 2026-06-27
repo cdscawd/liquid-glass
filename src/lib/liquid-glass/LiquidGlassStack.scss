@@ -1,0 +1,17 @@
+.liquid-glass-stack {
+  position: relative;
+  display: inline-block;
+
+  &__layer {
+    &--overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+
+      > * {
+        pointer-events: auto;
+      }
+    }
+  }
+}

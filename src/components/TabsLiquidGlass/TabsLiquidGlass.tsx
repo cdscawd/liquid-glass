@@ -2,6 +2,8 @@ import { type HTMLAttributes, type ReactNode, useState } from 'react'
 import {
   LiquidGlassFilter,
   useLiquidGlassEffect,
+  type LiquidGlassFilterMode,
+  type LiquidGlassNestedPolicy,
   type LiquidGlassParams,
 } from '../../lib/liquid-glass'
 import { ButtonGroupLiquidGlass } from '../ButtonGroupLiquidGlass'
@@ -16,6 +18,8 @@ export interface LiquidGlassTabItem {
 export interface TabsLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
   items: LiquidGlassTabItem[]
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   thumbGlassParams?: LiquidGlassParams
   panelGlassParams?: LiquidGlassParams
   size?: 'sm' | 'md' | 'lg'
@@ -26,29 +30,41 @@ export interface TabsLiquidGlassProps extends HTMLAttributes<HTMLDivElement> {
 
 function TabsLiquidGlassPanel({
   glassParams,
+  filterMode,
+  nestedPolicy,
   children,
 }: {
   glassParams?: LiquidGlassParams
+  filterMode?: LiquidGlassFilterMode
+  nestedPolicy?: LiquidGlassNestedPolicy
   children: ReactNode
 }) {
-  const { hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius } =
-    useLiquidGlassEffect<HTMLDivElement>(glassParams)
+  const {
+    hostRef, filterId, mapId, mapUrl, filterSize, filterStyle, borderRadius,
+    isFilterActive,
+    HostBoundary,
+  } = useLiquidGlassEffect<HTMLDivElement>(glassParams, {
+    filterMode,
+    nestedPolicy,
+  })
 
   return (
     <>
-      <LiquidGlassFilter
+      {isFilterActive && (
+        <LiquidGlassFilter
         filterId={filterId}
         mapId={mapId}
         mapUrl={mapUrl}
         width={filterSize.width}
         height={filterSize.height}
       />
+      )}
       <div
         ref={hostRef}
         className="tabs-liquid-glass__panel"
         style={{ ...filterStyle, borderRadius }}
       >
-        {children}
+        <HostBoundary>{children}</HostBoundary>
       </div>
     </>
   )
@@ -57,6 +73,8 @@ function TabsLiquidGlassPanel({
 export function TabsLiquidGlass({
   items,
   glassParams,
+  filterMode,
+  nestedPolicy,
   thumbGlassParams,
   panelGlassParams,
   size = 'md',
@@ -83,6 +101,8 @@ export function TabsLiquidGlass({
         variant="slider"
         size={size}
         glassParams={glassParams}
+        filterMode={filterMode}
+        nestedPolicy={nestedPolicy}
         thumbGlassParams={thumbGlassParams}
         value={value}
         onValueChange={handleChange}
@@ -93,7 +113,11 @@ export function TabsLiquidGlass({
           </ButtonGroupLiquidGlass.Item>
         ))}
       </ButtonGroupLiquidGlass>
-      <TabsLiquidGlassPanel glassParams={panelGlassParams}>
+      <TabsLiquidGlassPanel
+        glassParams={panelGlassParams}
+        filterMode={filterMode}
+        nestedPolicy={nestedPolicy}
+      >
         {active?.content}
       </TabsLiquidGlassPanel>
     </div>
