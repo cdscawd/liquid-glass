@@ -10,7 +10,15 @@
   padding: 12px 14px;
   font-size: 13px;
   line-height: 1.45;
-  transform: translateX(-50%);
+
+  &__anchor {
+    display: inline-flex;
+  }
+
+  &__trigger-wrap {
+    display: inline-flex;
+    cursor: pointer;
+  }
 
   &__trigger {
     padding: 0;

@@ -1,4 +1,8 @@
-
+.demo-showcase {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 100svh;
 
   &--landing {
     align-items: center;
@@ -52,3 +56,94 @@
       0 0 20px rgba(33, 97, 247, 0.65),
       0 0 40px rgba(33, 97, 247, 0.25);
   }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    padding: 32px 32px 80px;
+    scroll-margin-top: 24px;
+  }
+
+  &__hero {
+    margin-bottom: 32px;
+  }
+
+  &__title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  &__footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    text-align: center;
+  }
+}
+
+.demo-section {
+  scroll-margin-top: 24px;
+
+  & + & {
+    margin-top: 40px;
+  }
+
+  &__header {
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  &__props {
+    margin: 8px 0 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(180, 210, 255, 0.75);
+    font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  &__blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 880px;
+  }
+}
+
+@media (max-width: 768px) {
+  .demo-showcase {
+    flex-direction: column;
+
+    &__main {
+      padding: 20px 16px 64px;
+    }
+  }
+}
